@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ByC Descartables">
+<title>ByC Descartables</title>
+<style>
+html{scroll-behavior:smooth}
+body{padding-bottom:env(safe-area-inset-bottom)}
+button,input,select{touch-action:manipulation}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{flex:1;min-width:140px}
+.mobile-note{font-size:12px;color:#666;margin-top:8px}
+@media(max-width:600px){
+  header{padding:14px 12px}
+  header h1{font-size:19px}
+  nav{grid-template-columns:repeat(6,1fr);gap:4px;padding:6px;top:62px}
+  nav button{padding:9px 2px;font-size:11px;min-height:48px}
+  main{padding:8px}
+  .card{border-radius:12px;padding:12px;margin-bottom:9px}
+  table{font-size:12px;display:block;overflow-x:auto;white-space:nowrap}
+  th,td{padding:8px 5px}
+  .actions{display:grid;grid-template-columns:1fr}
+  .actions button{width:100%;min-width:0}
+}
+@media(hover:hover){button:hover{opacity:.9}}
+
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f4f4;color:#222}
+header{background:#111;color:#fff;padding:18px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px}header small{opacity:.7}
+nav{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:#fff;padding:8px;position:sticky;top:70px;z-index:4;box-shadow:0 2px 8px #0001}
+nav button{border:0;background:#eee;border-radius:10px;padding:10px 4px;font-size:12px}nav button.active{background:#111;color:#fff}
+main{max-width:900px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px #0000000d}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat b{display:block;font-size:22px;margin-top:5px}
+label{font-size:13px;font-weight:bold;display:block;margin:8px 0 5px}
+input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:9px;font-size:16px}
+button.primary{background:#111;color:#fff;border:0;border-radius:10px;padding:13px 16px;font-weight:bold;width:100%;margin-top:10px}
+button.secondary{background:#eee;border:0;border-radius:9px;padding:10px 12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 5px;border-bottom:1px solid #eee;text-align:left}
+.right{text-align:right}.danger{color:#b00020}.ok{color:#087f23}.muted{color:#777;font-size:13px}
+.receipt{border:1px dashed #999;padding:16px;background:#fff;max-width:420px;margin:auto}.receipt h2{text-align:center;margin:0 0 4px}
+.row{display:flex;justify-content:space-between;margin:7px 0}.total{font-size:21px;font-weight:bold;border-top:1px solid #222;padding-top:10px;margin-top:12px}
+@media(max-width:600px){nav{top:62px}.grid{grid-template-columns:1fr 1fr}main{padding:10px}.card{padding:13px}}
+</style>
+</head>
+<body>
+<header><h1>ByC Descartables</h1><small>Sistema de gestión · versión 2 · precio de venta editable</small></header>
+<nav id="nav">
+<button data-page="inicio">🏠<br>Inicio</button>
+<button data-page="productos">📦<br>Productos</button>
+<button data-page="ventas">🛒<br>Ventas</button>
+<button data-page="compras">🛍️<br>Compras</button>
+<button data-page="reportes">📊<br>Rentabilidad</button>
+<button data-page="datos">💾<br>Datos</button>
+</nav>
+<main>
+<section id="inicio" class="page active">
+<div class="grid">
+<div class="card stat">Ventas hoy<b id="hoyVentas">$0</b></div>
+<div class="card stat">Ganancia hoy<b id="hoyGanancia">$0</b></div>
+<div class="card stat">Ventas mes<b id="mesVentas">$0</b></div>
+<div class="card stat">Ganancia mes<b id="mesGanancia">$0</b></div>
+</div>
+<div class="card"><h3>Stock bajo</h3><div id="stockBajo" class="muted">No hay productos cargados.</div></div>
+</section>
+
+<section id="productos" class="page">
+<div class="card"><h2>Nuevo producto</h2>
+<label>Nombre del producto</label><input id="pNombre" placeholder="Ej. Vasos 200 cc">
+<label>Precio de compra</label><input id="pCompra" type="number" min="0" step="0.01" placeholder="0">
+<label>Precio de venta</label><input id="pVenta" type="number" min="0" step="0.01" placeholder="0">
+<label>Stock</label><input id="pStock" type="number" min="0" step="1" placeholder="0">
+<button class="primary" onclick="agregarProducto()">Agregar producto</button>
+</div>
+<div class="card"><h2>Productos</h2><div id="listaProductos"></div></div>
+</section>
+
+<section id="ventas" class="page">
+<div class="card"><h2>Nueva venta</h2>
+<label>Producto</label><select id="vProducto" onchange="mostrarPrecio()"></select>
+<label>Cantidad</label><input id="vCantidad" type="number" min="1" step="1" value="1">
+<label>Precio de venta</label><input id="vPrecio" type="number" min="0" step="0.01" placeholder="Precio habitual">
+<div id="vInfo" class="muted">Podés modificar el precio solo para esta venta.</div>
+<button class="primary" onclick="agregarAlCarrito()">Agregar a la venta</button>
+</div>
+<div class="card"><h3>Venta actual</h3><div id="carrito"></div>
+<button class="primary" onclick="finalizarVenta()">Finalizar venta y generar comprobante</button></div>
+<div class="card" id="comprobanteCard" style="display:none"><h3>Comprobante</h3><div id="comprobante"></div>
+<button class="secondary" onclick="window.print()">🖨️ Imprimir / guardar PDF</button>
+<button class="secondary" onclick="compartir()">📲 Compartir</button></div>
+</section>
+
+<section id="compras" class="page">
+<div class="card"><h2>Nueva compra</h2>
+<label>Producto</label><select id="cProducto"></select>
+<label>Cantidad</label><input id="cCantidad" type="number" min="1" step="1" value="1">
+<label>Precio de compra por unidad/paquete</label><input id="cPrecio" type="number" min="0" step="0.01">
+<button class="primary" onclick="registrarCompra()">Registrar compra</button>
+</div>
+<div class="card"><h3>Últimas compras</h3><div id="listaCompras"></div></div>
+</section>
+
+<section id="datos" class="page">
+<div class="card"><h2>Datos y copia de seguridad</h2>
+<p class="muted">Podés pasar tus datos de la PC al iPhone y viceversa usando una copia de seguridad. Esto no requiere instalar una app desde App Store.</p>
+<div class="actions">
+<button class="primary" onclick="exportarDatos()">⬇️ Exportar datos</button>
+<button class="secondary" onclick="$('archivoDatos').click()">⬆️ Importar datos</button>
+</div>
+<input id="archivoDatos" type="file" accept="application/json,.json" style="display:none" onchange="importarDatos(event)">
+<div class="mobile-note">Importar reemplaza los datos actuales de este dispositivo. Hacé una copia antes.</div>
+</div>
+</section>
+
+<section id="reportes" class="page">
+<div class="card"><h2>Rentabilidad</h2><div id="resumenRentabilidad"></div></div>
+<div class="card"><h3>Ventas recientes</h3><div id="listaVentas"></div></div>
+</section>
+</main>
+<script>
+const KEY='byc_demo_v2';
+const OLD_KEY='byc_demo_v1';
+let carrito=[];
+let db;
+try { db=JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e) { db=null; }
+if(!db || typeof db!=='object'){
+  let old=null;
+  try { old=JSON.parse(localStorage.getItem(OLD_KEY)||'null'); } catch(e) {}
+  db=old || {productos:[],ventas:[],compras:[],numeroVenta:0};
+  localStorage.setItem(KEY,JSON.stringify(db));
+}
+db.productos=Array.isArray(db.productos)?db.productos:[];
+db.ventas=Array.isArray(db.ventas)?db.ventas:[];
+db.compras=Array.isArray(db.compras)?db.compras:[];
+db.numeroVenta=Number(db.numeroVenta)||0;
+
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:2}).format(Number(n)||0);
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(db));renderAll()};
+function localDateISO(d=new Date()){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+const today=()=>localDateISO();
+const month=()=>today().slice(0,7);
+
+document.querySelectorAll('#nav button').forEach(b=>{
+  b.addEventListener('click',()=>show(b.dataset.page));
+});
+function show(id){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  const page=$(id);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+  renderAll();
+}
+
+function agregarProducto(){
+  const n=$('pNombre').value.trim();
+  const pc=Number($('pCompra').value);
+  const pv=Number($('pVenta').value);
+  const s=Number($('pStock').value);
+  if(!n || !Number.isFinite(pc)||pc<0 || !Number.isFinite(pv)||pv<0 || !Number.isFinite(s)||s<0)
+    return alert('Completá todos los datos correctamente.');
+  db.productos.push({id:Date.now()+Math.random(),nombre:n,compra:pc,venta:pv,stock:s});
+  $('pNombre').value=''; $('pCompra').value=''; $('pVenta').value=''; $('pStock').value='';
+  save(); alert('Producto agregado.');
+}
+
+function renderSelects(){
+  const opts=db.productos.map(p=>`<option value="${p.id}">${esc(p.nombre)} — ${money(p.venta)} (stock ${p.stock})</option>`).join('');
+  $('vProducto').innerHTML=opts||'<option value="">No hay productos</option>';
+  $('cProducto').innerHTML=opts||'<option value="">No hay productos</option>';
+  mostrarPrecio();
+  mostrarPrecioCompra();
+}
+
+function mostrarPrecio(){
+  const p=db.productos.find(x=>String(x.id)===$('vProducto').value);
+  if(p){
+    $('vPrecio').value=p.venta;
+    $('vInfo').textContent=`Precio habitual: ${money(p.venta)} · Stock disponible: ${p.stock}. Podés cambiarlo para esta venta.`;
+  }else{
+    $('vPrecio').value=''; $('vInfo').textContent='';
+  }
+}
+function mostrarPrecioCompra(){
+  const p=db.productos.find(x=>String(x.id)===$('cProducto').value);
+  if(p) $('cPrecio').value=p.compra;
+}
+
+function agregarAlCarrito(){
+  const p=db.productos.find(x=>String(x.id)===$('vProducto').value);
+  const q=Number($('vCantidad').value), precio=Number($('vPrecio').value);
+  if(!p||!Number.isFinite(q)||q<1||!Number.isFinite(precio)||precio<0)return alert('Completá los datos.');
+  const ya=carrito.filter(x=>x.id===p.id).reduce((a,x)=>a+x.cantidad,0);
+  if(q+ya>p.stock)return alert('No hay suficiente stock.');
+  carrito.push({id:p.id,nombre:p.nombre,cantidad:q,precio,costo:p.compra,total:q*precio});
+  renderCarrito();
+}
+function renderCarrito(){
+  const el=$('carrito');
+  if(!carrito.length){el.innerHTML='<span class="muted">No hay productos agregados.</span>';return}
+  el.innerHTML='<table><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th><th></th></tr>'+
+    carrito.map((x,i)=>`<tr><td>${esc(x.nombre)}</td><td>${x.cantidad}</td><td>${money(x.precio)}</td><td>${money(x.total)}</td><td><button class="secondary" onclick="quitarDelCarrito(${i})">✕</button></td></tr>`).join('')+
+    '</table><div class="total right">TOTAL '+money(carrito.reduce((a,x)=>a+x.total,0))+'</div>';
+}
+function quitarDelCarrito(i){carrito.splice(i,1);renderCarrito();}
+function finalizarVenta(){
+  if(!carrito.length)return alert('Agregá al menos un producto.');
+  let total=carrito.reduce((a,x)=>a+x.total,0);
+  let costo=carrito.reduce((a,x)=>a+x.costo*x.cantidad,0);
+  carrito.forEach(x=>{const p=db.productos.find(p=>p.id===x.id);if(p)p.stock-=x.cantidad;});
+  db.numeroVenta++;
+  const venta={id:Date.now(),numero:db.numeroVenta,fecha:new Date().toISOString(),items:carrito,total,costo,ganancia:total-costo};
+  db.ventas.unshift(venta); save(); mostrarComprobante(venta); carrito=[]; renderCarrito();
+}
+function mostrarComprobante(v){
+  const fecha=new Date(v.fecha).toLocaleString('es-AR');
+  $('comprobante').innerHTML=`<div class="receipt"><h2>ByC Descartables</h2><div style="text-align:center" class="muted">Comprobante de venta<br>${fecha}<br>N.º ${String(v.numero).padStart(6,'0')}</div><hr>`+
+  v.items.map(x=>`<div class="row"><span>${esc(x.nombre)} × ${x.cantidad}</span><b>${money(x.total)}</b></div>`).join('')+
+  `<div class="row total"><span>TOTAL</span><span>${money(v.total)}</span></div><p style="text-align:center">¡Gracias por su compra!</p></div>`;
+  $('comprobanteCard').style.display='block';
+}
+async function compartir(){
+  const txt=document.querySelector('.receipt')?.innerText||'';
+  if(navigator.share){try{await navigator.share({title:'ByC Descartables',text:txt})}catch(e){}}
+  else alert('Tu navegador no permite compartir directamente. Podés usar Imprimir / guardar PDF.');
+}
+function registrarCompra(){
+  const p=db.productos.find(x=>String(x.id)===$('cProducto').value);
+  const q=Number($('cCantidad').value), precio=Number($('cPrecio').value);
+  if(!p||!Number.isFinite(q)||q<1||!Number.isFinite(precio)||precio<0)return alert('Completá los datos.');
+  p.stock+=q;p.compra=precio;
+  db.compras.unshift({fecha:new Date().toISOString(),producto:p.nombre,cantidad:q,precio,total:q*precio});
+  save();alert('Compra registrada y stock actualizado.');
+}
+
+function renderProductos(){
+  $('listaProductos').innerHTML=db.productos.length?
+  '<table><tr><th>Producto</th><th>Compra</th><th>Venta</th><th>Stock</th><th>Acciones</th></tr>'+
+  db.productos.map(p=>`<tr><td>${esc(p.nombre)}</td><td>${money(p.compra)}</td><td>${money(p.venta)}</td><td>${p.stock}</td><td><button class="secondary" onclick="editarProducto('${String(p.id)}')">✏️ Editar</button> <button class="secondary danger" onclick="eliminarProducto('${String(p.id)}')">🗑️ Eliminar</button></td></tr>`).join('')+
+  '</table>':'<span class="muted">No hay productos cargados.</span>';
+}
+function editarProducto(id){
+  const p=db.productos.find(x=>String(x.id)===String(id)); if(!p)return;
+  const nombre=prompt('Nombre del producto:',p.nombre); if(nombre===null)return;
+  const n=nombre.trim(); if(!n)return alert('El nombre no puede quedar vacío.');
+  const venta=prompt('Nuevo precio de venta:',p.venta); if(venta===null)return;
+  const pv=Number(venta); if(!Number.isFinite(pv)||pv<0)return alert('Precio inválido.');
+  const compra=prompt('Precio de compra:',p.compra); if(compra===null)return;
+  const pc=Number(compra); if(!Number.isFinite(pc)||pc<0)return alert('Precio de compra inválido.');
+  p.nombre=n;p.venta=pv;p.compra=pc;save();alert('Producto actualizado.');
+}
+function eliminarProducto(id){
+  const p=db.productos.find(x=>String(x.id)===String(id)); if(!p)return;
+  if(!confirm(`¿Querés eliminar el producto "${p.nombre}"?\\n\\nEsta acción no se puede deshacer.`))return;
+  const vendido=db.ventas.some(v=>v.items?.some(i=>String(i.id)===String(id)));
+  if(vendido && !confirm('Este producto aparece en ventas anteriores. ¿Eliminarlo igualmente?'))return;
+  db.productos=db.productos.filter(x=>String(x.id)!==String(id));
+  carrito=carrito.filter(x=>String(x.id)!==String(id));
+  save();alert('Producto eliminado.');
+}
+function renderCompras(){
+  $('listaCompras').innerHTML=db.compras.slice(0,10).map(x=>`<div class="row"><span>${esc(x.producto)} × ${x.cantidad}</span><b>${money(x.total)}</b></div>`).join('')||'<span class="muted">Sin compras.</span>';
+}
+function renderVentas(){
+  $('listaVentas').innerHTML=db.ventas.slice(0,10).map(v=>`<div class="row"><span>Venta #${String(v.numero).padStart(6,'0')}<br><small>${new Date(v.fecha).toLocaleDateString('es-AR')}</small></span><b>${money(v.total)}<br><small class="ok">Gan. ${money(v.ganancia)}</small></b></div>`).join('')||'<span class="muted">Sin ventas.</span>';
+}
+function exportarDatos(){
+  const copia={version:2,exportadoEn:new Date().toISOString(),db};
+  const blob=new Blob([JSON.stringify(copia,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`ByC_Descartables_backup_${today()}.json`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importarDatos(ev){
+  const file=ev.target.files?.[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const raw=JSON.parse(reader.result);
+      const nuevo=raw?.db||raw;
+      if(!nuevo || !Array.isArray(nuevo.productos) || !Array.isArray(nuevo.ventas) || !Array.isArray(nuevo.compras))
+        throw new Error('Formato inválido');
+      if(!confirm('Esto reemplazará los datos actuales de este dispositivo. ¿Continuar?')) return;
+      db={
+        productos:nuevo.productos,
+        ventas:nuevo.ventas,
+        compras:nuevo.compras,
+        numeroVenta:Number(nuevo.numeroVenta)||0
+      };
+      localStorage.setItem(KEY,JSON.stringify(db));
+      carrito=[]; renderAll(); alert('Datos importados correctamente.');
+    }catch(e){alert('No se pudo importar el archivo. Verificá que sea una copia de ByC Descartables.');}
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function renderAll(){
+  renderSelects();renderProductos();renderCompras();renderVentas();
+  const tv=db.ventas.filter(v=>v.fecha.slice(0,10)===today()), tm=db.ventas.filter(v=>v.fecha.slice(0,7)===month());
+  $('hoyVentas').textContent=money(tv.reduce((a,v)=>a+v.total,0));
+  $('hoyGanancia').textContent=money(tv.reduce((a,v)=>a+v.ganancia,0));
+  $('mesVentas').textContent=money(tm.reduce((a,v)=>a+v.total,0));
+  $('mesGanancia').textContent=money(tm.reduce((a,v)=>a+v.ganancia,0));
+  const bajos=db.productos.filter(p=>p.stock<=5);
+  $('stockBajo').innerHTML=bajos.length?bajos.map(p=>`<div class="row"><span>${esc(p.nombre)}</span><b class="${p.stock===0?'danger':''}">${p.stock}</b></div>`).join(''):'Todo bien por ahora.';
+  const ventas=tm.reduce((a,v)=>a+v.total,0),gan=tm.reduce((a,v)=>a+v.ganancia,0),costo=tm.reduce((a,v)=>a+v.costo,0),rent=ventas?gan/ventas*100:0;
+  $('resumenRentabilidad').innerHTML=`<div class="grid"><div class="stat">Ventas<b>${money(ventas)}</b></div><div class="stat">Costo vendido<b>${money(costo)}</b></div><div class="stat">Ganancia<b class="ok">${money(gan)}</b></div><div class="stat">Rentabilidad<b>${rent.toFixed(2)}%</b></div></div>`;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  $('vProducto').addEventListener('change',mostrarPrecio);
+  $('cProducto').addEventListener('change',mostrarPrecioCompra);
+  document.querySelector('#nav button')?.classList.add('active');
+  renderAll();
+});
+</script>
+</body></html>

@@ -1,0 +1,15 @@
+ByC Descartables V2 - CORREGIDA
+- Se corrigió el funcionamiento de los botones usando referencias explícitas a los elementos.
+- Se agregó eliminar productos.
+- Se mantiene editar nombre, precio de venta y precio de compra.
+- Se mantiene precio de venta modificable únicamente para cada venta.
+- Se agregó quitar productos de la venta actual.
+
+
+NUEVA VERSIÓN COMPATIBLE CON CELULAR
+- Se agregó formato PWA para instalarla en iPhone/Android desde el navegador.
+- Funciona también desde PC.
+- Se agregó menú "Datos" para exportar/importar una copia de seguridad.
+- La aplicación sigue funcionando sin conexión una vez cargada/instalada.
+IMPORTANTE: esta versión permite pasar datos entre dispositivos mediante una copia de seguridad. No sincroniza automáticamente la PC y el celular en tiempo real.
+Para sincronización automática entre ambos equipos haría falta conectarla a una base de datos en la nube.
