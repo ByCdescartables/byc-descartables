@@ -84,12 +84,29 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 5px;b
 
 <section id="ventas" class="page">
 <div class="card"><h2>Nueva venta</h2>
-<label>Producto</label><select id="vProducto" onchange="mostrarPrecio()"></select>
-<label>Cantidad</label><input id="vCantidad" type="number" min="1" step="1" value="1">
-<label>Precio de venta</label><input id="vPrecio" type="number" min="0" step="0.01" placeholder="Precio habitual">
+
+<label>Cliente</label>
+<input id="vCliente" placeholder="Ej. Juan Pérez">
+
+<label>Forma de pago</label>
+<select id="vPago">
+
+<option value="pagado">💵 Pagado</option> <option value="cuenta">📒 Cuenta corriente</option> </select>
+
+<label>Producto</label>
+<select id="vProducto" onchange="mostrarPrecio()"></select>
+
+<label>Cantidad</label>
+<input id="vCantidad" type="number" min="1" step="1" value="1">
+
+<label>Precio de venta</label>
+<input id="vPrecio" type="number" min="0" step="0.01" placeholder="Precio habitual">
+
 <div id="vInfo" class="muted">Podés modificar el precio solo para esta venta.</div>
+
 <button class="primary" onclick="agregarAlCarrito()">Agregar a la venta</button>
-</div>
+
+
 <div class="card"><h3>Venta actual</h3><div id="carrito"></div>
 <button class="primary" onclick="finalizarVenta()">Finalizar venta y generar comprobante</button></div>
 <div class="card" id="comprobanteCard" style="display:none"><h3>Comprobante</h3><div id="comprobante"></div>
@@ -127,209 +144,1339 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 5px;b
 <script>
 const KEY='byc_demo_v2';
 const OLD_KEY='byc_demo_v1';
+
 let carrito=[];
 let db;
-try { db=JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e) { db=null; }
+
+try {
+  db=JSON.parse(localStorage.getItem(KEY)||'null');
+} catch(e) {
+  db=null;
+}
+
 if(!db || typeof db!=='object'){
   let old=null;
-  try { old=JSON.parse(localStorage.getItem(OLD_KEY)||'null'); } catch(e) {}
-  db=old || {productos:[],ventas:[],compras:[],numeroVenta:0};
+  try {
+    old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');
+  } catch(e) {}
+
+  db=old || {
+    productos:[],
+    ventas:[],
+    compras:[],
+    pagos:[],
+    clientes:[],
+    numeroVenta:0
+  };
+
   localStorage.setItem(KEY,JSON.stringify(db));
 }
+
 db.productos=Array.isArray(db.productos)?db.productos:[];
 db.ventas=Array.isArray(db.ventas)?db.ventas:[];
 db.compras=Array.isArray(db.compras)?db.compras:[];
+db.pagos=Array.isArray(db.pagos)?db.pagos:[];
+db.clientes=Array.isArray(db.clientes)?db.clientes:[];
 db.numeroVenta=Number(db.numeroVenta)||0;
 
 const $=id=>document.getElementById(id);
-const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:2}).format(Number(n)||0);
-const save=()=>{localStorage.setItem(KEY,JSON.stringify(db));renderAll()};
+
+const money=n=>new Intl.NumberFormat('es-AR',{
+  style:'currency',
+  currency:'ARS',
+  maximumFractionDigits:2
+}).format(Number(n)||0);
+
+const save=()=>{
+  localStorage.setItem(KEY,JSON.stringify(db));
+  renderAll();
+};
+
 function localDateISO(d=new Date()){
-  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 }
+
 const today=()=>localDateISO();
 const month=()=>today().slice(0,7);
 
 document.querySelectorAll('#nav button').forEach(b=>{
-  b.addEventListener('click',()=>show(b.dataset.page));
+  b.addEventListener('click',()=>{
+    show(b.dataset.page);
+  });
 });
+
 function show(id){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>{
+    x.classList.remove('active');
+  });
+
   const page=$(id);
-  if(page) page.classList.add('active');
-  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+  if(page)page.classList.add('active');
+
+  document.querySelectorAll('#nav button').forEach(x=>{
+    x.classList.toggle('active',x.dataset.page===id);
+  });
+
   renderAll();
 }
+
+
+/* =========================
+   PRODUCTOS
+========================= */
 
 function agregarProducto(){
   const n=$('pNombre').value.trim();
   const pc=Number($('pCompra').value);
   const pv=Number($('pVenta').value);
   const s=Number($('pStock').value);
-  if(!n || !Number.isFinite(pc)||pc<0 || !Number.isFinite(pv)||pv<0 || !Number.isFinite(s)||s<0)
+
+  if(
+    !n ||
+    !Number.isFinite(pc)||pc<0 ||
+    !Number.isFinite(pv)||pv<0 ||
+    !Number.isFinite(s)||s<0
+  ){
     return alert('Completá todos los datos correctamente.');
-  db.productos.push({id:Date.now()+Math.random(),nombre:n,compra:pc,venta:pv,stock:s});
-  $('pNombre').value=''; $('pCompra').value=''; $('pVenta').value=''; $('pStock').value='';
-  save(); alert('Producto agregado.');
+  }
+
+  db.productos.push({
+    id:Date.now()+Math.random(),
+    nombre:n,
+    compra:pc,
+    venta:pv,
+    stock:s
+  });
+
+  $('pNombre').value='';
+  $('pCompra').value='';
+  $('pVenta').value='';
+  $('pStock').value='';
+
+  save();
+  alert('Producto agregado.');
 }
 
 function renderSelects(){
-  const opts=db.productos.map(p=>`<option value="${p.id}">${esc(p.nombre)} — ${money(p.venta)} (stock ${p.stock})</option>`).join('');
+  const opts=db.productos.map(p=>
+    `<option value="${p.id}">
+      ${esc(p.nombre)} — ${money(p.venta)} (stock ${p.stock})
+    </option>`
+  ).join('');
+
   $('vProducto').innerHTML=opts||'<option value="">No hay productos</option>';
   $('cProducto').innerHTML=opts||'<option value="">No hay productos</option>';
+
   mostrarPrecio();
   mostrarPrecioCompra();
 }
 
 function mostrarPrecio(){
-  const p=db.productos.find(x=>String(x.id)===$('vProducto').value);
+  const p=db.productos.find(
+    x=>String(x.id)===$('vProducto').value
+  );
+
   if(p){
     $('vPrecio').value=p.venta;
-    $('vInfo').textContent=`Precio habitual: ${money(p.venta)} · Stock disponible: ${p.stock}. Podés cambiarlo para esta venta.`;
+
+    $('vInfo').textContent=
+      `Precio habitual: ${money(p.venta)} · Stock disponible: ${p.stock}. Podés cambiarlo para esta venta.`;
   }else{
-    $('vPrecio').value=''; $('vInfo').textContent='';
+    $('vPrecio').value='';
+    $('vInfo').textContent='';
   }
 }
+
 function mostrarPrecioCompra(){
-  const p=db.productos.find(x=>String(x.id)===$('cProducto').value);
-  if(p) $('cPrecio').value=p.compra;
+  const p=db.productos.find(
+    x=>String(x.id)===$('cProducto').value
+  );
+
+  if(p)$('cPrecio').value=p.compra;
 }
+
+
+/* =========================
+   CLIENTES
+========================= */
+
+function normalizarCliente(nombre){
+  return String(nombre||'')
+    .trim()
+    .replace(/\s+/g,' ')
+    .toLowerCase();
+}
+
+function registrarCliente(nombre){
+  nombre=String(nombre||'').trim();
+
+  if(!nombre)return null;
+
+  const existente=db.clientes.find(
+    c=>normalizarCliente(c.nombre)===normalizarCliente(nombre)
+  );
+
+  if(existente)return existente;
+
+  const cliente={
+    id:Date.now()+Math.random(),
+    nombre:nombre
+  };
+
+  db.clientes.push(cliente);
+
+  return cliente;
+}
+
+function obtenerNombreCliente(id){
+  const c=db.clientes.find(x=>String(x.id)===String(id));
+  return c?c.nombre:'Consumidor final';
+}
+
+
+/* =========================
+   VENTA
+========================= */
 
 function agregarAlCarrito(){
-  const p=db.productos.find(x=>String(x.id)===$('vProducto').value);
-  const q=Number($('vCantidad').value), precio=Number($('vPrecio').value);
-  if(!p||!Number.isFinite(q)||q<1||!Number.isFinite(precio)||precio<0)return alert('Completá los datos.');
-  const ya=carrito.filter(x=>x.id===p.id).reduce((a,x)=>a+x.cantidad,0);
-  if(q+ya>p.stock)return alert('No hay suficiente stock.');
-  carrito.push({id:p.id,nombre:p.nombre,cantidad:q,precio,costo:p.compra,total:q*precio});
+
+  const p=db.productos.find(
+    x=>String(x.id)===$('vProducto').value
+  );
+
+  const q=Number($('vCantidad').value);
+  const precio=Number($('vPrecio').value);
+
+  if(
+    !p ||
+    !Number.isFinite(q)||q<1 ||
+    !Number.isFinite(precio)||precio<0
+  ){
+    return alert('Completá los datos.');
+  }
+
+  const ya=carrito
+    .filter(x=>x.id===p.id)
+    .reduce((a,x)=>a+x.cantidad,0);
+
+  if(q+ya>p.stock){
+    return alert('No hay suficiente stock.');
+  }
+
+  carrito.push({
+    id:p.id,
+    nombre:p.nombre,
+    cantidad:q,
+    precio:precio,
+    costo:p.compra,
+    total:q*precio
+  });
+
   renderCarrito();
 }
+
 function renderCarrito(){
+
   const el=$('carrito');
-  if(!carrito.length){el.innerHTML='<span class="muted">No hay productos agregados.</span>';return}
-  el.innerHTML='<table><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th><th></th></tr>'+
-    carrito.map((x,i)=>`<tr><td>${esc(x.nombre)}</td><td>${x.cantidad}</td><td>${money(x.precio)}</td><td>${money(x.total)}</td><td><button class="secondary" onclick="quitarDelCarrito(${i})">✕</button></td></tr>`).join('')+
-    '</table><div class="total right">TOTAL '+money(carrito.reduce((a,x)=>a+x.total,0))+'</div>';
-}
-function quitarDelCarrito(i){carrito.splice(i,1);renderCarrito();}
-function finalizarVenta(){
-  if(!carrito.length)return alert('Agregá al menos un producto.');
-  let total=carrito.reduce((a,x)=>a+x.total,0);
-  let costo=carrito.reduce((a,x)=>a+x.costo*x.cantidad,0);
-  carrito.forEach(x=>{const p=db.productos.find(p=>p.id===x.id);if(p)p.stock-=x.cantidad;});
-  db.numeroVenta++;
-  const venta={id:Date.now(),numero:db.numeroVenta,fecha:new Date().toISOString(),items:carrito,total,costo,ganancia:total-costo};
-  db.ventas.unshift(venta); save(); mostrarComprobante(venta); carrito=[]; renderCarrito();
-}
-function mostrarComprobante(v){
-  const fecha=new Date(v.fecha).toLocaleString('es-AR');
-  $('comprobante').innerHTML=`<div class="receipt"><h2>ByC Descartables</h2><div style="text-align:center" class="muted">Comprobante de venta<br>${fecha}<br>N.º ${String(v.numero).padStart(6,'0')}</div><hr>`+
-  v.items.map(x=>`<div class="row"><span>${esc(x.nombre)} × ${x.cantidad}</span><b>${money(x.total)}</b></div>`).join('')+
-  `<div class="row total"><span>TOTAL</span><span>${money(v.total)}</span></div><p style="text-align:center">¡Gracias por su compra!</p></div>`;
-  $('comprobanteCard').style.display='block';
-}
-async function compartir(){
-  const txt=document.querySelector('.receipt')?.innerText||'';
-  if(navigator.share){try{await navigator.share({title:'ByC Descartables',text:txt})}catch(e){}}
-  else alert('Tu navegador no permite compartir directamente. Podés usar Imprimir / guardar PDF.');
-}
-function registrarCompra(){
-  const p=db.productos.find(x=>String(x.id)===$('cProducto').value);
-  const q=Number($('cCantidad').value), precio=Number($('cPrecio').value);
-  if(!p||!Number.isFinite(q)||q<1||!Number.isFinite(precio)||precio<0)return alert('Completá los datos.');
-  p.stock+=q;p.compra=precio;
-  db.compras.unshift({fecha:new Date().toISOString(),producto:p.nombre,cantidad:q,precio,total:q*precio});
-  save();alert('Compra registrada y stock actualizado.');
+
+  if(!carrito.length){
+    el.innerHTML=
+      '<span class="muted">No hay productos agregados.</span>';
+    return;
+  }
+
+  el.innerHTML=
+    '<table>'+
+    '<tr>'+
+    '<th>Producto</th>'+
+    '<th>Cant.</th>'+
+    '<th>Precio</th>'+
+    '<th>Total</th>'+
+    '<th></th>'+
+    '</tr>'+
+    carrito.map((x,i)=>`
+      <tr>
+        <td>${esc(x.nombre)}</td>
+        <td>${x.cantidad}</td>
+        <td>${money(x.precio)}</td>
+        <td>${money(x.total)}</td>
+        <td>
+          <button class="secondary"
+            onclick="quitarDelCarrito(${i})">✕</button>
+        </td>
+      </tr>
+    `).join('')+
+    '</table>'+
+    '<div class="total right">'+
+    'TOTAL '+
+    money(carrito.reduce((a,x)=>a+x.total,0))+
+    '</div>';
 }
 
-function renderProductos(){
-  $('listaProductos').innerHTML=db.productos.length?
-  '<table><tr><th>Producto</th><th>Compra</th><th>Venta</th><th>Stock</th><th>Acciones</th></tr>'+
-  db.productos.map(p=>`<tr><td>${esc(p.nombre)}</td><td>${money(p.compra)}</td><td>${money(p.venta)}</td><td>${p.stock}</td><td><button class="secondary" onclick="editarProducto('${String(p.id)}')">✏️ Editar</button> <button class="secondary danger" onclick="eliminarProducto('${String(p.id)}')">🗑️ Eliminar</button></td></tr>`).join('')+
-  '</table>':'<span class="muted">No hay productos cargados.</span>';
+function quitarDelCarrito(i){
+  carrito.splice(i,1);
+  renderCarrito();
 }
-function editarProducto(id){
-  const p=db.productos.find(x=>String(x.id)===String(id)); if(!p)return;
-  const nombre=prompt('Nombre del producto:',p.nombre); if(nombre===null)return;
-  const n=nombre.trim(); if(!n)return alert('El nombre no puede quedar vacío.');
-  const venta=prompt('Nuevo precio de venta:',p.venta); if(venta===null)return;
-  const pv=Number(venta); if(!Number.isFinite(pv)||pv<0)return alert('Precio inválido.');
-  const compra=prompt('Precio de compra:',p.compra); if(compra===null)return;
-  const pc=Number(compra); if(!Number.isFinite(pc)||pc<0)return alert('Precio de compra inválido.');
-  p.nombre=n;p.venta=pv;p.compra=pc;save();alert('Producto actualizado.');
+
+
+/* =========================
+   FINALIZAR VENTA
+========================= */
+
+function finalizarVenta(){
+
+  if(!carrito.length){
+    return alert('Agregá al menos un producto.');
+  }
+
+  const total=carrito.reduce(
+    (a,x)=>a+x.total,0
+  );
+
+  const costo=carrito.reduce(
+    (a,x)=>a+x.costo*x.cantidad,0
+  );
+
+  const clienteNombre=
+    ($('vCliente').value||'Consumidor final').trim()
+    ||'Consumidor final';
+
+  const pago=$('vPago').value;
+
+  const cliente=registrarCliente(clienteNombre);
+
+  carrito.forEach(x=>{
+    const p=db.productos.find(
+      p=>p.id===x.id
+    );
+
+    if(p)p.stock-=x.cantidad;
+  });
+
+  db.numeroVenta++;
+
+  const venta={
+    id:Date.now(),
+    numero:db.numeroVenta,
+    fecha:new Date().toISOString(),
+
+    clienteId:cliente?cliente.id:null,
+    cliente:clienteNombre,
+
+    pago:pago,
+
+    estado:pago==='pagado'
+      ?'Pagado'
+      :'Cuenta corriente',
+
+    items:JSON.parse(JSON.stringify(carrito)),
+
+    total:total,
+    costo:costo,
+    ganancia:total-costo
+  };
+
+  db.ventas.unshift(venta);
+
+  save();
+
+  mostrarComprobante(venta);
+
+  carrito=[];
+
+  $('vCliente').value='';
+  $('vPago').value='pagado';
+
+  renderCarrito();
+
+  alert(
+    pago==='cuenta'
+      ?'Venta registrada en cuenta corriente.'
+      :'Venta registrada como pagada.'
+  );
 }
-function eliminarProducto(id){
-  const p=db.productos.find(x=>String(x.id)===String(id)); if(!p)return;
-  if(!confirm(`¿Querés eliminar el producto "${p.nombre}"?\\n\\nEsta acción no se puede deshacer.`))return;
-  const vendido=db.ventas.some(v=>v.items?.some(i=>String(i.id)===String(id)));
-  if(vendido && !confirm('Este producto aparece en ventas anteriores. ¿Eliminarlo igualmente?'))return;
-  db.productos=db.productos.filter(x=>String(x.id)!==String(id));
-  carrito=carrito.filter(x=>String(x.id)!==String(id));
-  save();alert('Producto eliminado.');
+
+
+/* =========================
+   COMPROBANTE
+========================= */
+
+function mostrarComprobante(v){
+
+  const fecha=
+    new Date(v.fecha).toLocaleString('es-AR');
+
+  const cliente=
+    esc(v.cliente||'Consumidor final');
+
+  const formaPago=
+    v.pago==='cuenta'
+      ?'📒 CUENTA CORRIENTE'
+      :'💵 PAGADO';
+
+  $('comprobante').innerHTML=`
+
+    <div class="receipt">
+
+      <h2>ByC Descartables</h2>
+
+      <div style="text-align:center" class="muted">
+
+        Venta #${String(v.numero).padStart(6,'0')}<br>
+
+        ${fecha}<br>
+
+        Cliente: ${cliente}<br>
+
+        <b>${formaPago}</b>
+
+      </div>
+
+      <hr>
+
+      ${v.items.map(x=>`
+
+        <div class="row">
+
+          <span>
+            ${esc(x.nombre)} × ${x.cantidad}
+          </span>
+
+          <b>${money(x.total)}</b>
+
+        </div>
+
+      `).join('')}
+
+      <div class="row total">
+
+        <span>TOTAL</span>
+
+        <span>${money(v.total)}</span>
+
+      </div>
+
+      <p style="text-align:center">
+        ¡Gracias por su compra!
+      </p>
+
+    </div>
+  `;
+
+  $('comprobanteCard').style.display='block';
 }
-function renderCompras(){
-  $('listaCompras').innerHTML=db.compras.slice(0,10).map(x=>`<div class="row"><span>${esc(x.producto)} × ${x.cantidad}</span><b>${money(x.total)}</b></div>`).join('')||'<span class="muted">Sin compras.</span>';
-}
-function renderVentas(){
-  $('listaVentas').innerHTML=db.ventas.slice(0,10).map(v=>`<div class="row"><span>Venta #${String(v.numero).padStart(6,'0')}<br><small>${new Date(v.fecha).toLocaleDateString('es-AR')}</small></span><b>${money(v.total)}<br><small class="ok">Gan. ${money(v.ganancia)}</small></b></div>`).join('')||'<span class="muted">Sin ventas.</span>';
-}
-function exportarDatos(){
-  const copia={version:2,exportadoEn:new Date().toISOString(),db};
-  const blob=new Blob([JSON.stringify(copia,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`ByC_Descartables_backup_${today()}.json`;
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function importarDatos(ev){
-  const file=ev.target.files?.[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
+
+async function compartir(){
+
+  const txt=
+    document.querySelector('.receipt')?.innerText||'';
+
+  if(navigator.share){
+
     try{
+
+      await navigator.share({
+        title:'ByC Descartables',
+        text:txt
+      });
+
+    }catch(e){}
+
+  }else{
+
+    alert(
+      'Tu navegador no permite compartir directamente. Podés usar Imprimir / guardar PDF.'
+    );
+
+  }
+}
+
+
+/* =========================
+   CUENTAS CORRIENTES
+========================= */
+
+function totalVentasCliente(clienteId){
+
+  return db.ventas
+    .filter(v=>
+      v.clienteId===clienteId &&
+      v.pago==='cuenta'
+    )
+    .reduce((a,v)=>a+Number(v.total||0),0);
+}
+
+function totalPagosCliente(clienteId){
+
+  return db.pagos
+    .filter(p=>p.clienteId===clienteId)
+    .reduce((a,p)=>a+Number(p.importe||0),0);
+}
+
+function saldoCliente(clienteId){
+
+  return totalVentasCliente(clienteId)
+    -totalPagosCliente(clienteId);
+}
+
+function registrarPago(clienteId){
+
+  const cliente=db.clientes.find(
+    c=>String(c.id)===String(clienteId)
+  );
+
+  if(!cliente)return;
+
+  const saldo=saldoCliente(cliente.id);
+
+  if(saldo<=0){
+    return alert('Este cliente no tiene saldo pendiente.');
+  }
+
+  const importeTexto=prompt(
+    `Saldo pendiente de ${cliente.nombre}: ${money(saldo)}\n\n`+
+    '¿Cuánto paga?'
+  );
+
+  if(importeTexto===null)return;
+
+  const importe=Number(
+    String(importeTexto)
+      .replace(/\./g,'')
+      .replace(',','.')
+  );
+
+  if(!Number.isFinite(importe)||importe<=0){
+    return alert('Importe inválido.');
+  }
+
+  if(importe>saldo){
+    return alert(
+      `El pago no puede superar el saldo de ${money(saldo)}.`
+    );
+  }
+
+  db.pagos.unshift({
+    id:Date.now(),
+    clienteId:cliente.id,
+    cliente:cliente.nombre,
+    fecha:new Date().toISOString(),
+    importe:importe
+  });
+
+  save();
+
+  alert(
+    `Pago registrado.\n\nNuevo saldo: ${money(saldo-importe)}`
+  );
+}
+
+function verEstadoCuenta(clienteId){
+
+  const cliente=db.clientes.find(
+    c=>String(c.id)===String(clienteId)
+  );
+
+  if(!cliente)return;
+
+  const movimientos=[];
+
+  db.ventas
+    .filter(v=>
+      v.clienteId===cliente.id &&
+      v.pago==='cuenta'
+    )
+    .forEach(v=>{
+      movimientos.push({
+        fecha:v.fecha,
+        tipo:`Venta #${String(v.numero).padStart(6,'0')}`,
+        importe:Number(v.total||0)
+      });
+    });
+
+  db.pagos
+    .filter(p=>p.clienteId===cliente.id)
+    .forEach(p=>{
+      movimientos.push({
+        fecha:p.fecha,
+        tipo:'💵 Pago',
+        importe:-Number(p.importe||0)
+      });
+    });
+
+  movimientos.sort(
+    (a,b)=>new Date(a.fecha)-new Date(b.fecha)
+  );
+
+  let saldo=0;
+
+  const filas=movimientos.map(m=>{
+
+    saldo+=m.importe;
+
+    return `
+      <tr>
+        <td>${new Date(m.fecha).toLocaleDateString('es-AR')}</td>
+        <td>${esc(m.tipo)}</td>
+        <td class="right">
+          ${m.importe>=0
+            ?money(m.importe)
+            :'-'+money(Math.abs(m.importe))}
+        </td>
+        <td class="right">
+          ${money(saldo)}
+        </td>
+      </tr>
+    `;
+
+  }).join('');
+
+  $('listaVentas').innerHTML=`
+
+    <div class="card">
+
+      <h2>📒 Estado de cuenta</h2>
+
+      <h3>${esc(cliente.nombre)}</h3>
+
+      <div class="grid">
+
+        <div class="stat">
+          Ventas
+          <b>${money(totalVentasCliente(cliente.id))}</b>
+        </div>
+
+        <div class="stat">
+          Pagos
+          <b>${money(totalPagosCliente(cliente.id))}</b>
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h2>
+          Saldo:
+          ${money(saldoCliente(cliente.id))}
+        </h2>
+
+        <button
+          class="primary"
+          onclick="registrarPago('${String(cliente.id)}')">
+          💵 Registrar pago
+        </button>
+
+      </div>
+
+      <table>
+
+        <tr>
+          <th>Fecha</th>
+          <th>Movimiento</th>
+          <th class="right">Importe</th>
+          <th class="right">Saldo</th>
+        </tr>
+
+        ${filas||`
+          <tr>
+            <td colspan="4" class="muted">
+              Sin movimientos.
+            </td>
+          </tr>
+        `}
+
+      </table>
+
+    </div>
+  `;
+}
+
+
+/* =========================
+   COMPRAS
+========================= */
+
+function registrarCompra(){
+
+  const p=db.productos.find(
+    x=>String(x.id)===$('cProducto').value
+  );
+
+  const q=Number($('cCantidad').value);
+  const precio=Number($('cPrecio').value);
+
+  if(
+    !p ||
+    !Number.isFinite(q)||q<1 ||
+    !Number.isFinite(precio)||precio<0
+  ){
+    return alert('Completá los datos.');
+  }
+
+  p.stock+=q;
+  p.compra=precio;
+
+  db.compras.unshift({
+    fecha:new Date().toISOString(),
+    producto:p.nombre,
+    cantidad:q,
+    precio:precio,
+    total:q*precio,
+    proveedor:'Sin proveedor'
+  });
+
+  save();
+
+  alert('Compra registrada y stock actualizado.');
+}
+
+
+/* =========================
+   PRODUCTOS
+========================= */
+
+function renderProductos(){
+
+  $('listaProductos').innerHTML=
+    db.productos.length?
+
+    '<table>'+
+    '<tr>'+
+    '<th>Producto</th>'+
+    '<th>Compra</th>'+
+    '<th>Venta</th>'+
+    '<th>Stock</th>'+
+    '<th>Acciones</th>'+
+    '</tr>'+
+
+    db.productos.map(p=>`
+
+      <tr>
+
+        <td>${esc(p.nombre)}</td>
+
+        <td>${money(p.compra)}</td>
+
+        <td>${money(p.venta)}</td>
+
+        <td>${p.stock}</td>
+
+        <td>
+
+          <button
+            class="secondary"
+            onclick="editarProducto('${String(p.id)}')">
+            ✏️ Editar
+          </button>
+
+          <button
+            class="secondary danger"
+            onclick="eliminarProducto('${String(p.id)}')">
+            🗑️ Eliminar
+          </button>
+
+        </td>
+
+      </tr>
+
+    `).join('')+
+
+    '</table>'
+
+    :
+
+    '<span class="muted">No hay productos cargados.</span>';
+}
+
+function editarProducto(id){
+
+  const p=db.productos.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!p)return;
+
+  const nombre=prompt(
+    'Nombre del producto:',
+    p.nombre
+  );
+
+  if(nombre===null)return;
+
+  const n=nombre.trim();
+
+  if(!n){
+    return alert('El nombre no puede quedar vacío.');
+  }
+
+  const venta=prompt(
+    'Nuevo precio de venta:',
+    p.venta
+  );
+
+  if(venta===null)return;
+
+  const pv=Number(venta);
+
+  if(!Number.isFinite(pv)||pv<0){
+    return alert('Precio inválido.');
+  }
+
+  const compra=prompt(
+    'Precio de compra:',
+    p.compra
+  );
+
+  if(compra===null)return;
+
+  const pc=Number(compra);
+
+  if(!Number.isFinite(pc)||pc<0){
+    return alert('Precio de compra inválido.');
+  }
+
+  p.nombre=n;
+  p.venta=pv;
+  p.compra=pc;
+
+  save();
+
+  alert('Producto actualizado.');
+}
+
+function eliminarProducto(id){
+
+  const p=db.productos.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!p)return;
+
+  if(!confirm(
+    `¿Querés eliminar el producto "${p.nombre}"?\n\n`+
+    'Esta acción no se puede deshacer.'
+  ))return;
+
+  const vendido=db.ventas.some(
+    v=>v.items?.some(
+      i=>String(i.id)===String(id)
+    )
+  );
+
+  if(
+    vendido &&
+    !confirm(
+      'Este producto aparece en ventas anteriores. ¿Eliminarlo igualmente?'
+    )
+  )return;
+
+  db.productos=db.productos.filter(
+    x=>String(x.id)!==String(id)
+  );
+
+  carrito=carrito.filter(
+    x=>String(x.id)!==String(id)
+  );
+
+  save();
+
+  alert('Producto eliminado.');
+}
+
+
+/* =========================
+   COMPRAS
+========================= */
+
+function renderCompras(){
+
+  $('listaCompras').innerHTML=
+    db.compras.slice(0,20).map(x=>`
+
+      <div class="row">
+
+        <span>
+          ${esc(x.producto)} × ${x.cantidad}<br>
+          <small class="muted">
+            Proveedor: ${esc(x.proveedor||'Sin proveedor')}
+          </small>
+        </span>
+
+        <b>${money(x.total)}</b>
+
+      </div>
+
+    `).join('')
+
+    ||
+
+    '<span class="muted">Sin compras.</span>';
+}
+
+
+/* =========================
+   VENTAS
+========================= */
+
+function renderVentas(){
+
+  $('listaVentas').innerHTML=
+    db.ventas.slice(0,20).map(v=>`
+
+      <div class="card" style="margin-bottom:8px">
+
+        <div class="row">
+
+          <span>
+
+            <b>
+              Venta #${String(v.numero).padStart(6,'0')}
+            </b>
+
+            <br>
+
+            <small>
+              ${new Date(v.fecha).toLocaleString('es-AR')}
+            </small>
+
+            <br>
+
+            <small>
+              👤 ${esc(v.cliente||'Consumidor final')}
+            </small>
+
+          </span>
+
+          <b>${money(v.total)}</b>
+
+        </div>
+
+        <div class="row">
+
+          <span>
+            ${v.pago==='cuenta'
+              ?'📒 Cuenta corriente'
+              :'💵 Pagado'}
+          </span>
+
+          <button
+            class="secondary"
+            onclick="verVenta('${String(v.id)}')">
+            👁️ Ver detalle
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join('')
+
+    ||
+
+    '<span class="muted">Sin ventas.</span>';
+}
+
+function verVenta(id){
+
+  const v=db.ventas.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!v){
+    return alert('No se encontró la venta.');
+  }
+
+  const fecha=
+    new Date(v.fecha).toLocaleString('es-AR');
+
+  const cliente=
+    esc(v.cliente||'Consumidor final');
+
+  const formaPago=
+    v.pago==='cuenta'
+      ?'📒 CUENTA CORRIENTE'
+      :'💵 PAGADO';
+
+  $('comprobante').innerHTML=`
+
+    <div class="receipt">
+
+      <h2>ByC Descartables</h2>
+
+      <div style="text-align:center" class="muted">
+
+        Venta #${String(v.numero).padStart(6,'0')}<br>
+
+        ${fecha}<br>
+
+        Cliente: ${cliente}<br>
+
+        <b>${formaPago}</b>
+
+      </div>
+
+      <hr>
+
+      ${v.items.map(x=>`
+
+        <div class="row">
+
+          <span>
+            ${esc(x.nombre)} × ${x.cantidad}
+          </span>
+
+          <b>${money(x.total)}</b>
+
+        </div>
+
+      `).join('')}
+
+      <div class="row total">
+
+        <span>TOTAL</span>
+
+        <span>${money(v.total)}</span>
+
+      </div>
+
+      <p style="text-align:center">
+        ¡Gracias por su compra!
+      </p>
+
+    </div>
+  `;
+
+  $('comprobanteCard').style.display='block';
+
+  $('comprobanteCard').scrollIntoView({
+    behavior:'smooth'
+  });
+}
+
+
+/* =========================
+   DATOS
+========================= */
+
+function exportarDatos(){
+
+  const copia={
+    version:3,
+    exportadoEn:new Date().toISOString(),
+    db:db
+  };
+
+  const blob=new Blob(
+    [JSON.stringify(copia,null,2)],
+    {type:'application/json'}
+  );
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement('a');
+
+  a.href=url;
+
+  a.download=
+    `ByC_Descartables_backup_${today()}.json`;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  setTimeout(
+    ()=>URL.revokeObjectURL(url),
+    1000
+  );
+}
+
+function importarDatos(ev){
+
+  const file=ev.target.files?.[0];
+
+  if(!file)return;
+
+  const reader=new FileReader();
+
+  reader.onload=()=>{
+
+    try{
+
       const raw=JSON.parse(reader.result);
+
       const nuevo=raw?.db||raw;
-      if(!nuevo || !Array.isArray(nuevo.productos) || !Array.isArray(nuevo.ventas) || !Array.isArray(nuevo.compras))
+
+      if(
+        !nuevo ||
+        !Array.isArray(nuevo.productos) ||
+        !Array.isArray(nuevo.ventas) ||
+        !Array.isArray(nuevo.compras)
+      ){
         throw new Error('Formato inválido');
-      if(!confirm('Esto reemplazará los datos actuales de este dispositivo. ¿Continuar?')) return;
+      }
+
+      if(
+        !confirm(
+          'Esto reemplazará los datos actuales de este dispositivo. ¿Continuar?'
+        )
+      )return;
+
       db={
         productos:nuevo.productos,
         ventas:nuevo.ventas,
         compras:nuevo.compras,
+        pagos:Array.isArray(nuevo.pagos)
+          ?nuevo.pagos:[],
+        clientes:Array.isArray(nuevo.clientes)
+          ?nuevo.clientes:[],
         numeroVenta:Number(nuevo.numeroVenta)||0
       };
-      localStorage.setItem(KEY,JSON.stringify(db));
-      carrito=[]; renderAll(); alert('Datos importados correctamente.');
-    }catch(e){alert('No se pudo importar el archivo. Verificá que sea una copia de ByC Descartables.');}
+
+      localStorage.setItem(
+        KEY,
+        JSON.stringify(db)
+      );
+
+      carrito=[];
+
+      renderAll();
+
+      alert('Datos importados correctamente.');
+
+    }catch(e){
+
+      alert(
+        'No se pudo importar el archivo. Verificá que sea una copia de ByC Descartables.'
+      );
+
+    }
+
     ev.target.value='';
   };
+
   reader.readAsText(file);
 }
 
+
+/* =========================
+   REPORTES
+========================= */
+
 function renderAll(){
-  renderSelects();renderProductos();renderCompras();renderVentas();
-  const tv=db.ventas.filter(v=>v.fecha.slice(0,10)===today()), tm=db.ventas.filter(v=>v.fecha.slice(0,7)===month());
-  $('hoyVentas').textContent=money(tv.reduce((a,v)=>a+v.total,0));
-  $('hoyGanancia').textContent=money(tv.reduce((a,v)=>a+v.ganancia,0));
-  $('mesVentas').textContent=money(tm.reduce((a,v)=>a+v.total,0));
-  $('mesGanancia').textContent=money(tm.reduce((a,v)=>a+v.ganancia,0));
-  const bajos=db.productos.filter(p=>p.stock<=5);
-  $('stockBajo').innerHTML=bajos.length?bajos.map(p=>`<div class="row"><span>${esc(p.nombre)}</span><b class="${p.stock===0?'danger':''}">${p.stock}</b></div>`).join(''):'Todo bien por ahora.';
-  const ventas=tm.reduce((a,v)=>a+v.total,0),gan=tm.reduce((a,v)=>a+v.ganancia,0),costo=tm.reduce((a,v)=>a+v.costo,0),rent=ventas?gan/ventas*100:0;
-  $('resumenRentabilidad').innerHTML=`<div class="grid"><div class="stat">Ventas<b>${money(ventas)}</b></div><div class="stat">Costo vendido<b>${money(costo)}</b></div><div class="stat">Ganancia<b class="ok">${money(gan)}</b></div><div class="stat">Rentabilidad<b>${rent.toFixed(2)}%</b></div></div>`;
+
+  renderSelects();
+  renderProductos();
+  renderCompras();
+  renderVentas();
+
+  const tv=db.ventas.filter(
+    v=>v.fecha.slice(0,10)===today()
+  );
+
+  const tm=db.ventas.filter(
+    v=>v.fecha.slice(0,7)===month()
+  );
+
+  $('hoyVentas').textContent=
+    money(tv.reduce((a,v)=>a+v.total,0));
+
+  $('hoyGanancia').textContent=
+    money(tv.reduce((a,v)=>a+v.ganancia,0));
+
+  $('mesVentas').textContent=
+    money(tm.reduce((a,v)=>a+v.total,0));
+
+  $('mesGanancia').textContent=
+    money(tm.reduce((a,v)=>a+v.ganancia,0));
+
+  const bajos=db.productos.filter(
+    p=>p.stock<=5
+  );
+
+  $('stockBajo').innerHTML=
+    bajos.length?
+
+    bajos.map(p=>`
+
+      <div class="row">
+
+        <span>${esc(p.nombre)}</span>
+
+        <b class="${p.stock===0?'danger':''}">
+          ${p.stock}
+        </b>
+
+      </div>
+
+    `).join('')
+
+    :
+
+    'Todo bien por ahora.';
+
+  const ventas=tm.reduce(
+    (a,v)=>a+v.total,0
+  );
+
+  const gan=tm.reduce(
+    (a,v)=>a+v.ganancia,0
+  );
+
+  const costo=tm.reduce(
+    (a,v)=>a+v.costo,0
+  );
+
+  const rent=
+    ventas?gan/ventas*100:0;
+
+  $('resumenRentabilidad').innerHTML=`
+
+    <div class="grid">
+
+      <div class="stat">
+        Ventas
+        <b>${money(ventas)}</b>
+      </div>
+
+      <div class="stat">
+        Costo vendido
+        <b>${money(costo)}</b>
+      </div>
+
+      <div class="stat">
+        Ganancia
+        <b class="ok">${money(gan)}</b>
+      </div>
+
+      <div class="stat">
+        Rentabilidad
+        <b>${rent.toFixed(2)}%</b>
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h3>📒 Cuentas corrientes</h3>
+
+      ${
+        db.clientes.filter(c=>saldoCliente(c.id)>0).length
+
+        ?
+
+        db.clientes
+          .filter(c=>saldoCliente(c.id)>0)
+          .map(c=>`
+
+            <div class="row">
+
+              <span>
+                👤 <b>${esc(c.nombre)}</b><br>
+                <small>
+                  Saldo: ${money(saldoCliente(c.id))}
+                </small>
+              </span>
+
+              <div>
+
+                <button
+                  class="secondary"
+                  onclick="verEstadoCuenta('${String(c.id)}')">
+                  📒 Estado
+                </button>
+
+                <button
+                  class="secondary"
+                  onclick="registrarPago('${String(c.id)}')">
+                  💵 Pago
+                </button>
+
+              </div>
+
+            </div>
+
+          `).join('')
+
+        :
+
+        '<span class="muted">No hay cuentas corrientes pendientes.</span>'
+      }
+
+    </div>
+  `;
 }
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+
+/* =========================
+   SEGURIDAD HTML
+========================= */
+
+function esc(s){
+
+  return String(s).replace(
+    /[&<>"']/g,
+
+    m=>({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[m])
+  );
+}
+
+
+/* =========================
+   SERVICE WORKER
+========================= */
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+  window.addEventListener(
+    'load',
+    ()=>{
+      navigator.serviceWorker
+        .register('sw.js')
+        .catch(()=>{});
+    }
+  );
+
 }
-document.addEventListener('DOMContentLoaded',()=>{
-  $('vProducto').addEventListener('change',mostrarPrecio);
-  $('cProducto').addEventListener('change',mostrarPrecioCompra);
-  document.querySelector('#nav button')?.classList.add('active');
-  renderAll();
-});
+
+
+/* =========================
+   INICIO
+========================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  ()=>{
+
+    $('vProducto')
+      .addEventListener(
+        'change',
+        mostrarPrecio
+      );
+
+    $('cProducto')
+      .addEventListener(
+        'change',
+        mostrarPrecioCompra
+      );
+
+    document
+      .querySelector('#nav button')
+      ?.classList.add('active');
+
+    renderAll();
+
+  }
+);
 </script>
 </body></html>
