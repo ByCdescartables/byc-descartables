@@ -11,6 +11,7 @@
 <style>
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
+
 body{
   margin:0;
   font-family:Arial,sans-serif;
@@ -18,7 +19,11 @@ body{
   color:#222;
   padding-bottom:20px
 }
-button,input,select,textarea{touch-action:manipulation}
+
+button,input,select,textarea{
+  touch-action:manipulation
+}
+
 button{cursor:pointer}
 
 header{
@@ -29,8 +34,15 @@ header{
   top:0;
   z-index:10
 }
-header h1{margin:0;font-size:22px}
-header small{opacity:.7}
+
+header h1{
+  margin:0;
+  font-size:22px
+}
+
+header small{
+  opacity:.7
+}
 
 nav{
   display:grid;
@@ -43,6 +55,7 @@ nav{
   z-index:9;
   box-shadow:0 2px 8px #0002
 }
+
 nav button{
   border:0;
   background:#eee;
@@ -50,6 +63,7 @@ nav button{
   padding:10px 4px;
   font-size:12px
 }
+
 nav button.active{
   background:#111;
   color:#fff
@@ -60,6 +74,7 @@ main{
   margin:auto;
   padding:14px
 }
+
 .page{display:none}
 .page.active{display:block}
 
@@ -126,6 +141,15 @@ button.danger{
   color:#b00020
 }
 
+button.delete{
+  background:#ffe5e5;
+  color:#b00020;
+  border:0;
+  border-radius:9px;
+  padding:9px 11px;
+  font-weight:bold
+}
+
 .actions{
   display:flex;
   gap:8px;
@@ -147,7 +171,8 @@ table{
 th,td{
   padding:9px 5px;
   border-bottom:1px solid #eee;
-  text-align:left
+  text-align:left;
+  vertical-align:middle
 }
 
 .right{text-align:right}
@@ -205,16 +230,20 @@ th,td{
   margin-top:3px
 }
 
-.deleteBtn{
-  background:#fff0f0!important;
-  color:#b00020!important;
-  border:1px solid #f2caca!important;
+.deleteRow{
+  text-align:right;
+  white-space:nowrap
 }
 
 @media(max-width:600px){
 
-  header{padding:14px 12px}
-  header h1{font-size:19px}
+  header{
+    padding:14px 12px
+  }
+
+  header h1{
+    font-size:19px
+  }
 
   nav{
     top:62px;
@@ -229,7 +258,9 @@ th,td{
     min-height:48px
   }
 
-  main{padding:8px}
+  main{
+    padding:8px
+  }
 
   .card{
     border-radius:12px;
@@ -574,6 +605,10 @@ th,td{
 
 <script>
 
+/* =====================================================
+   BASE DE DATOS
+===================================================== */
+
 const KEY='byc_demo_v3';
 const OLD_KEY='byc_demo_v2';
 
@@ -629,6 +664,10 @@ db.numeroVenta=Number(db.numeroVenta)||0;
 const $=id=>document.getElementById(id);
 
 
+/* =====================================================
+   UTILIDADES
+===================================================== */
+
 function money(n){
 
   return new Intl.NumberFormat(
@@ -642,7 +681,6 @@ function money(n){
 
 }
 
-
 function save(){
 
   localStorage.setItem(
@@ -653,7 +691,6 @@ function save(){
   renderAll();
 
 }
-
 
 function localDateISO(d=new Date()){
 
@@ -671,9 +708,7 @@ function localDateISO(d=new Date()){
 
 }
 
-
 const today=()=>localDateISO();
-
 const month=()=>today().slice(0,7);
 
 
@@ -693,7 +728,6 @@ document
   );
 
 });
-
 
 function show(id){
 
@@ -730,18 +764,9 @@ function show(id){
 function agregarProducto(){
 
   const nombre=$('pNombre').value.trim();
-
-  const compra=Number(
-    $('pCompra').value
-  );
-
-  const venta=Number(
-    $('pVenta').value
-  );
-
-  const stock=Number(
-    $('pStock').value
-  );
+  const compra=Number($('pCompra').value);
+  const venta=Number($('pVenta').value);
+  const stock=Number($('pStock').value);
 
   if(
     !nombre ||
@@ -763,13 +788,9 @@ function agregarProducto(){
   db.productos.push({
 
     id:Date.now()+Math.random(),
-
     nombre:nombre,
-
     compra:compra,
-
     venta:venta,
-
     stock:stock
 
   });
@@ -838,7 +859,7 @@ function renderProductos(){
               </button>
 
               <button
-                class="secondary deleteBtn"
+                class="delete"
                 onclick="eliminarProducto('${p.id}')">
                 🗑️
               </button>
@@ -907,7 +928,6 @@ function editarProducto(id){
   ){
 
     alert('Datos inválidos.');
-
     return;
   }
 
@@ -931,9 +951,30 @@ function eliminarProducto(id){
 
   if(!p)return;
 
-  if(!confirm(
-    `¿Eliminar "${p.nombre}"?\n\nEsta acción no se puede deshacer.`
-  ))return;
+  const tieneMovimientos=
+    db.ventas.some(v=>
+      v.items?.some(i=>
+        String(i.id)===String(id)
+      )
+    ) ||
+    db.compras.some(c=>
+      String(c.productoId)===String(id)
+    );
+
+  let mensaje=
+    `¿Eliminar "${p.nombre}"?\n\n`;
+
+  if(tieneMovimientos){
+
+    mensaje+=
+      '⚠️ Este producto tiene ventas o compras registradas.\n'+
+      'Se eliminará del listado de productos, pero se conservará el historial.\n\n';
+
+  }
+
+  mensaje+='¿Continuar?';
+
+  if(!confirm(mensaje))return;
 
   db.productos=db.productos.filter(
     x=>String(x.id)!==String(id)
@@ -975,7 +1016,6 @@ function renderSelects(){
     '<option value="">No hay productos</option>';
 
   mostrarPrecio();
-
   mostrarPrecioCompra();
 
 }
@@ -991,7 +1031,6 @@ function mostrarPrecio(){
 
     $('vPrecio').value='';
     $('vInfo').textContent='';
-
     return;
   }
 
@@ -1030,7 +1069,6 @@ function normalizarCliente(nombre){
 
 }
 
-
 function registrarCliente(nombre){
 
   nombre=String(nombre||'').trim();
@@ -1053,6 +1091,14 @@ function registrarCliente(nombre){
   db.clientes.push(cliente);
 
   return cliente;
+
+}
+
+function obtenerCliente(id){
+
+  return db.clientes.find(
+    c=>String(c.id)===String(id)
+  );
 
 }
 
@@ -1084,7 +1130,6 @@ function agregarAlCarrito(){
   ){
 
     alert('Completá los datos de la venta.');
-
     return;
   }
 
@@ -1111,15 +1156,10 @@ function agregarAlCarrito(){
   carrito.push({
 
     id:producto.id,
-
     nombre:producto.nombre,
-
     cantidad:cantidad,
-
     precio:precio,
-
     costo:Number(producto.compra)||0,
-
     total:cantidad*precio
 
   });
@@ -1164,21 +1204,16 @@ function renderCarrito(){
           <tr>
 
             <td>${esc(x.nombre)}</td>
-
             <td>${x.cantidad}</td>
-
             <td>${money(x.precio)}</td>
-
             <td>${money(x.total)}</td>
 
             <td>
-
               <button
-                class="secondary"
+                class="delete"
                 onclick="quitarDelCarrito(${i})">
                 ✕
               </button>
-
             </td>
 
           </tr>
@@ -1333,9 +1368,7 @@ function finalizarVenta(){
   carrito=[];
 
   $('vCliente').value='';
-
   $('vPago').value='pagado';
-
   $('vCantidad').value=1;
 
   renderCarrito();
@@ -1352,70 +1385,55 @@ function finalizarVenta(){
 
 
 /* =====================================================
-   ELIMINAR VENTA
+   BORRAR VENTA
 ===================================================== */
 
 function eliminarVenta(id){
 
-  const venta=db.ventas.find(
-    v=>String(v.id)===String(id)
+  const v=db.ventas.find(
+    x=>String(x.id)===String(id)
   );
 
-  if(!venta){
-    alert('Venta no encontrada.');
-    return;
-  }
+  if(!v)return;
 
-  let mensaje=
-    `¿Eliminar la Venta #${String(venta.numero).padStart(6,'0')}?\n\n`+
-    `Cliente: ${venta.cliente || 'Consumidor final'}\n`+
-    `Total: ${money(venta.total)}\n\n`+
-    `El stock vendido será devuelto automáticamente.`;
+  if(!confirm(
+    `¿Eliminar la Venta #${String(v.numero).padStart(6,'0')}?\n\n`+
+    `Total: ${money(v.total)}\n`+
+    `Cliente: ${v.cliente || 'Consumidor final'}\n\n`+
+    `El stock de los productos vendidos será devuelto.`
+  ))return;
 
-  if(venta.pago==='cuenta'){
-    mensaje+=
-      `\n\n⚠️ Esta venta pertenece a una cuenta corriente. `+
-      `Si ya registraste pagos de este cliente, revisá luego su estado de cuenta.`;
-  }
-
-  if(!confirm(mensaje)){
-    return;
-  }
 
   /* DEVOLVER STOCK */
 
-  if(Array.isArray(venta.items)){
+  for(const item of (v.items||[])){
 
-    venta.items.forEach(item=>{
+    const p=db.productos.find(
+      x=>String(x.id)===String(item.id)
+    );
 
-      const producto=db.productos.find(
-        p=>String(p.id)===String(item.id)
-      );
+    if(p){
 
-      if(producto){
+      p.stock=
+        Number(p.stock||0)+
+        Number(item.cantidad||0);
 
-        producto.stock=
-          Number(producto.stock||0)+
-          Number(item.cantidad||0);
-
-      }
-
-    });
+    }
 
   }
+
 
   /* ELIMINAR VENTA */
 
   db.ventas=db.ventas.filter(
-    v=>String(v.id)!==String(id)
+    x=>String(x.id)!==String(id)
   );
+
 
   save();
 
-  $('comprobanteCard').style.display='none';
-
   alert(
-    `Venta #${String(venta.numero).padStart(6,'0')} eliminada.\n\n`+
+    `Venta #${String(v.numero).padStart(6,'0')} eliminada.\n\n`+
     `El stock fue devuelto correctamente.`
   );
 
@@ -1524,11 +1542,8 @@ async function compartir(){
     try{
 
       await navigator.share({
-
         title:'ByC Descartables',
-
         text:texto
-
       });
 
     }catch(e){}
@@ -1582,7 +1597,6 @@ function registrarCompra(){
   }
 
   producto.stock+=cantidad;
-
   producto.compra=precio;
 
   db.compras.unshift({
@@ -1612,85 +1626,6 @@ function registrarCompra(){
 
   alert(
     'Compra registrada y stock actualizado.'
-  );
-
-}
-
-
-/* =====================================================
-   ELIMINAR COMPRA
-===================================================== */
-
-function eliminarCompra(id){
-
-  const compra=db.compras.find(
-    c=>String(c.id)===String(id)
-  );
-
-  if(!compra){
-    alert('Compra no encontrada.');
-    return;
-  }
-
-  const producto=db.productos.find(
-    p=>String(p.id)===String(compra.productoId)
-  );
-
-  let mensaje=
-    `¿Eliminar esta compra?\n\n`+
-    `Producto: ${compra.producto}\n`+
-    `Cantidad: ${compra.cantidad}\n`+
-    `Proveedor: ${compra.proveedor}\n`+
-    `Total: ${money(compra.total)}\n\n`;
-
-  if(producto){
-
-    mensaje+=
-      `El stock actual es: ${producto.stock}\n`+
-      `Se descontarán ${compra.cantidad} unidades del stock.`;
-
-    if(
-      Number(producto.stock) <
-      Number(compra.cantidad)
-    ){
-
-      mensaje+=
-        `\n\n⚠️ ATENCIÓN: el stock actual es menor que la cantidad comprada. `+
-        `El stock quedará en 0.`;
-    }
-
-  }else{
-
-    mensaje+=
-      `⚠️ El producto ya no existe. La compra se eliminará igualmente.`;
-  }
-
-  if(!confirm(mensaje)){
-    return;
-  }
-
-  /* CORREGIR STOCK */
-
-  if(producto){
-
-    producto.stock=Math.max(
-      0,
-      Number(producto.stock||0)-
-      Number(compra.cantidad||0)
-    );
-
-  }
-
-  /* ELIMINAR COMPRA */
-
-  db.compras=db.compras.filter(
-    c=>String(c.id)!==String(id)
-  );
-
-  save();
-
-  alert(
-    'Compra eliminada correctamente y stock actualizado.'
   );
 
 }
@@ -1762,7 +1697,7 @@ function renderCompras(){
           <div class="actions">
 
             <button
-              class="secondary deleteBtn"
+              class="delete"
               onclick="eliminarCompra('${x.id}')">
 
               🗑️ Eliminar compra
@@ -1775,6 +1710,72 @@ function renderCompras(){
 
       `)
       .join('');
+
+}
+
+
+/* =====================================================
+   BORRAR COMPRA
+===================================================== */
+
+function eliminarCompra(id){
+
+  const compra=db.compras.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!compra)return;
+
+
+  if(!confirm(
+    `¿Eliminar esta compra?\n\n`+
+    `Producto: ${compra.producto}\n`+
+    `Cantidad: ${compra.cantidad}\n`+
+    `Total: ${money(compra.total)}\n\n`+
+    `El stock agregado por esta compra será descontado.`
+  ))return;
+
+
+  const producto=db.productos.find(
+    p=>String(p.id)===String(compra.productoId)
+  );
+
+
+  if(producto){
+
+    const nuevoStock=
+      Number(producto.stock||0)-
+      Number(compra.cantidad||0);
+
+
+    if(nuevoStock<0){
+
+      alert(
+        `No se puede eliminar esta compra porque el stock actual de "${producto.nombre}" `+
+        `es menor que la cantidad de esta compra.\n\n`+
+        `Stock actual: ${producto.stock}\n`+
+        `Cantidad de la compra: ${compra.cantidad}`
+      );
+
+      return;
+    }
+
+
+    producto.stock=nuevoStock;
+
+  }
+
+
+  db.compras=db.compras.filter(
+    x=>String(x.id)!==String(id)
+  );
+
+
+  save();
+
+  alert(
+    'Compra eliminada y stock actualizado.'
+  );
 
 }
 
@@ -1837,6 +1838,7 @@ function renderVentas(){
 
           </div>
 
+
           <div class="row">
 
             <span>
@@ -1848,6 +1850,7 @@ function renderVentas(){
               }
 
             </span>
+
 
             <button
               class="secondary"
@@ -1862,7 +1865,7 @@ function renderVentas(){
           <div class="actions">
 
             <button
-              class="secondary deleteBtn"
+              class="delete"
               onclick="eliminarVenta('${v.id}')">
 
               🗑️ Eliminar venta
@@ -1892,7 +1895,6 @@ function verVenta(id){
   if(!v){
 
     alert('Venta no encontrada.');
-
     return;
   }
 
@@ -1998,7 +2000,6 @@ function registrarPago(clienteId){
   ){
 
     alert('Importe inválido.');
-
     return;
   }
 
@@ -2023,7 +2024,6 @@ function registrarPago(clienteId){
   if(!fechaPago){
 
     alert('Tenés que indicar una fecha.');
-
     return;
   }
 
@@ -2113,39 +2113,33 @@ function registrarPago(clienteId){
 
 
 /* =====================================================
-   ELIMINAR PAGO
+   BORRAR PAGO
 ===================================================== */
 
 function eliminarPago(id){
 
   const pago=db.pagos.find(
-    p=>String(p.id)===String(id)
+    x=>String(x.id)===String(id)
   );
 
-  if(!pago){
-    alert('Pago no encontrado.');
-    return;
-  }
+  if(!pago)return;
 
   if(!confirm(
-
     `¿Eliminar este pago?\n\n`+
     `Cliente: ${pago.cliente}\n`+
     `Importe: ${money(pago.importe)}\n`+
-    `Fecha: ${new Date(pago.fecha).toLocaleDateString('es-AR')}\n`+
-    `Detalle: ${pago.detalle || 'Pago'}\n\n`+
-    `Esta acción no se puede deshacer.`
-
+    `Fecha: ${new Date(pago.fecha).toLocaleDateString('es-AR')}\n\n`+
+    `El saldo del cliente volverá a aumentar.`
   ))return;
 
   db.pagos=db.pagos.filter(
-    p=>String(p.id)!==String(id)
+    x=>String(x.id)!==String(id)
   );
 
   save();
 
   alert(
-    'Pago eliminado correctamente.'
+    'Pago eliminado y cuenta corriente actualizada.'
   );
 
 }
@@ -2175,8 +2169,6 @@ function verEstadoCuenta(clienteId){
 
       movimientos.push({
 
-        id:v.id,
-
         fecha:v.fecha,
 
         tipo:
@@ -2187,11 +2179,12 @@ function verEstadoCuenta(clienteId){
 
         detalle:'Venta a cuenta corriente',
 
-        clase:'venta'
+        ventaId:v.id
 
       });
 
     });
+
 
   db.pagos
     .filter(p=>
@@ -2201,8 +2194,6 @@ function verEstadoCuenta(clienteId){
     .forEach(p=>{
 
       movimientos.push({
-
-        id:p.id,
 
         fecha:p.fecha,
 
@@ -2214,11 +2205,12 @@ function verEstadoCuenta(clienteId){
         detalle:
           p.detalle || 'Pago',
 
-        clase:'pago'
+        pagoId:p.id
 
       });
 
     });
+
 
   movimientos.sort(
     (a,b)=>
@@ -2226,12 +2218,49 @@ function verEstadoCuenta(clienteId){
       new Date(b.fecha)
   );
 
+
   let saldo=0;
+
 
   const filas=
     movimientos.map(m=>{
 
       saldo+=m.importe;
+
+      const esPago=m.importe<0;
+
+      let accion='';
+
+      if(esPago){
+
+        accion=`
+
+          <button
+            class="delete"
+            onclick="eliminarPago('${m.pagoId}')">
+
+            🗑️
+
+          </button>
+
+        `;
+
+      }else{
+
+        accion=`
+
+          <button
+            class="delete"
+            onclick="eliminarVenta('${m.ventaId}')">
+
+            🗑️
+
+          </button>
+
+        `;
+
+      }
+
 
       return `
 
@@ -2261,33 +2290,19 @@ function verEstadoCuenta(clienteId){
             ${
               m.importe>=0
               ?money(m.importe)
-              :'-'+money(Math.abs(m.importe))
+              :'-'+money(
+                Math.abs(m.importe)
+              )
             }
 
           </td>
 
           <td class="right">
-
             ${money(saldo)}
-
           </td>
 
           <td>
-
-            ${
-              m.clase==='pago'
-              ?`
-                <button
-                  class="secondary deleteBtn"
-                  onclick="eliminarPago('${m.id}')">
-
-                  🗑️
-
-                </button>
-              `
-              :''
-            }
-
+            ${accion}
           </td>
 
         </tr>
@@ -2295,6 +2310,7 @@ function verEstadoCuenta(clienteId){
       `;
 
     }).join('');
+
 
   $('cuentasCorrientes').innerHTML=`
 
@@ -2320,6 +2336,7 @@ function verEstadoCuenta(clienteId){
 
         </div>
 
+
         <div class="stat">
 
           Pagos
@@ -2338,6 +2355,7 @@ function verEstadoCuenta(clienteId){
 
       </div>
 
+
       <div class="card">
 
         <h2>
@@ -2350,6 +2368,7 @@ function verEstadoCuenta(clienteId){
           )}
 
         </h2>
+
 
         ${
           saldoCliente(cliente.id)>0
@@ -2371,14 +2390,15 @@ function verEstadoCuenta(clienteId){
 
       </div>
 
+
       <h3>Movimientos</h3>
+
 
       <table>
 
         <tr>
 
           <th>Fecha</th>
-
           <th>Movimiento</th>
 
           <th class="right">
@@ -2392,6 +2412,7 @@ function verEstadoCuenta(clienteId){
           <th></th>
 
         </tr>
+
 
         ${
           filas ||
@@ -2468,6 +2489,7 @@ function renderCuentas(){
 
         </span>
 
+
         <div>
 
           <button
@@ -2477,6 +2499,7 @@ function renderCuentas(){
             📒 Estado
 
           </button>
+
 
           <button
             class="secondary"
@@ -2580,6 +2603,7 @@ function renderRentabilidad(){
 
       </div>
 
+
       <div class="stat">
 
         Costo vendido
@@ -2590,6 +2614,7 @@ function renderRentabilidad(){
 
       </div>
 
+
       <div class="stat">
 
         Ganancia
@@ -2599,6 +2624,7 @@ function renderRentabilidad(){
         </b>
 
       </div>
+
 
       <div class="stat">
 
@@ -2875,13 +2901,9 @@ function esc(s){
       m=>({
 
         '&':'&amp;',
-
         '<':'&lt;',
-
         '>':'&gt;',
-
         '"':'&quot;',
-
         "'":'&#39;'
 
       }[m])
