@@ -205,22 +205,10 @@ th,td{
   margin-top:3px
 }
 
-.deleteButton{
-  background:#fff0f0;
-  color:#b00020;
-  border:1px solid #f0caca;
-  border-radius:8px;
-  padding:7px 9px;
-  cursor:pointer
-}
-
-.editButton{
-  background:#eee;
-  color:#222;
-  border:0;
-  border-radius:8px;
-  padding:7px 9px;
-  cursor:pointer
+.deleteBtn{
+  background:#fff0f0!important;
+  color:#b00020!important;
+  border:1px solid #f2caca!important;
 }
 
 @media(max-width:600px){
@@ -274,7 +262,7 @@ th,td{
 
 <header>
   <h1>ByC Descartables</h1>
-  <small>Sistema de gestión · versión 4</small>
+  <small>Sistema de gestión · versión 5</small>
 </header>
 
 <nav id="nav">
@@ -433,11 +421,15 @@ th,td{
 
     <div class="actions">
 
-      <button class="secondary" onclick="window.print()">
+      <button
+        class="secondary"
+        onclick="window.print()">
         🖨️ Imprimir / PDF
       </button>
 
-      <button class="secondary" onclick="compartir()">
+      <button
+        class="secondary"
+        onclick="compartir()">
         📲 Compartir
       </button>
 
@@ -634,7 +626,6 @@ db.clientes=Array.isArray(db.clientes)
 
 db.numeroVenta=Number(db.numeroVenta)||0;
 
-
 const $=id=>document.getElementById(id);
 
 
@@ -682,6 +673,7 @@ function localDateISO(d=new Date()){
 
 
 const today=()=>localDateISO();
+
 const month=()=>today().slice(0,7);
 
 
@@ -739,9 +731,17 @@ function agregarProducto(){
 
   const nombre=$('pNombre').value.trim();
 
-  const compra=Number($('pCompra').value);
-  const venta=Number($('pVenta').value);
-  const stock=Number($('pStock').value);
+  const compra=Number(
+    $('pCompra').value
+  );
+
+  const venta=Number(
+    $('pVenta').value
+  );
+
+  const stock=Number(
+    $('pStock').value
+  );
 
   if(
     !nombre ||
@@ -753,7 +753,10 @@ function agregarProducto(){
     stock<0
   ){
 
-    alert('Completá todos los datos correctamente.');
+    alert(
+      'Completá todos los datos correctamente.'
+    );
+
     return;
   }
 
@@ -762,8 +765,11 @@ function agregarProducto(){
     id:Date.now()+Math.random(),
 
     nombre:nombre,
+
     compra:compra,
+
     venta:venta,
+
     stock:stock
 
   });
@@ -826,13 +832,13 @@ function renderProductos(){
             <td>
 
               <button
-                class="editButton"
+                class="secondary"
                 onclick="editarProducto('${p.id}')">
                 ✏️
               </button>
 
               <button
-                class="deleteButton"
+                class="secondary deleteBtn"
                 onclick="eliminarProducto('${p.id}')">
                 🗑️
               </button>
@@ -901,6 +907,7 @@ function editarProducto(id){
   ){
 
     alert('Datos inválidos.');
+
     return;
   }
 
@@ -924,29 +931,9 @@ function eliminarProducto(id){
 
   if(!p)return;
 
-  const usadoEnVentas=db.ventas.some(v=>
-    v.items?.some(i=>
-      String(i.id)===String(id)
-    )
-  );
-
-  const usadoEnCompras=db.compras.some(c=>
-    String(c.productoId)===String(id)
-  );
-
-  let mensaje=
-    `¿Eliminar "${p.nombre}"?\n\n`;
-
-  if(usadoEnVentas || usadoEnCompras){
-
-    mensaje+=
-      'Este producto aparece en ventas o compras históricas.\n'+
-      'Los movimientos históricos NO se eliminarán.\n\n';
-  }
-
-  mensaje+='Esta acción no se puede deshacer.';
-
-  if(!confirm(mensaje))return;
+  if(!confirm(
+    `¿Eliminar "${p.nombre}"?\n\nEsta acción no se puede deshacer.`
+  ))return;
 
   db.productos=db.productos.filter(
     x=>String(x.id)!==String(id)
@@ -988,6 +975,7 @@ function renderSelects(){
     '<option value="">No hay productos</option>';
 
   mostrarPrecio();
+
   mostrarPrecioCompra();
 
 }
@@ -1003,6 +991,7 @@ function mostrarPrecio(){
 
     $('vPrecio').value='';
     $('vInfo').textContent='';
+
     return;
   }
 
@@ -1057,77 +1046,13 @@ function registrarCliente(nombre){
   if(existente)return existente;
 
   const cliente={
-
     id:Date.now()+Math.random(),
     nombre:nombre
-
   };
 
   db.clientes.push(cliente);
 
   return cliente;
-
-}
-
-
-function obtenerCliente(id){
-
-  return db.clientes.find(
-    c=>String(c.id)===String(id)
-  );
-
-}
-
-
-/* =====================================================
-   BORRAR CLIENTE
-===================================================== */
-
-function eliminarCliente(clienteId){
-
-  const cliente=db.clientes.find(
-    c=>String(c.id)===String(clienteId)
-  );
-
-  if(!cliente)return;
-
-  const ventas=totalVentasCliente(cliente.id);
-  const pagos=totalPagosCliente(cliente.id);
-  const saldo=ventas-pagos;
-
-  const tieneVentas=db.ventas.some(v=>
-    String(v.clienteId)===String(cliente.id)
-  );
-
-  const tienePagos=db.pagos.some(p=>
-    String(p.clienteId)===String(cliente.id)
-  );
-
-  if(tieneVentas || tienePagos){
-
-    alert(
-      `No se puede eliminar a "${cliente.nombre}" porque tiene movimientos registrados.\n\n`+
-      `Ventas a cuenta: ${money(ventas)}\n`+
-      `Pagos: ${money(pagos)}\n`+
-      `Saldo: ${money(saldo)}\n\n`+
-      `Para conservar la historia, primero eliminá individualmente sus movimientos.`
-    );
-
-    return;
-  }
-
-  if(!confirm(
-    `¿Eliminar al cliente "${cliente.nombre}"?\n\n`+
-    `Esta acción no se puede deshacer.`
-  ))return;
-
-  db.clientes=db.clientes.filter(
-    c=>String(c.id)!==String(cliente.id)
-  );
-
-  save();
-
-  alert('Cliente eliminado.');
 
 }
 
@@ -1159,6 +1084,7 @@ function agregarAlCarrito(){
   ){
 
     alert('Completá los datos de la venta.');
+
     return;
   }
 
@@ -1185,10 +1111,15 @@ function agregarAlCarrito(){
   carrito.push({
 
     id:producto.id,
+
     nombre:producto.nombre,
+
     cantidad:cantidad,
+
     precio:precio,
+
     costo:Number(producto.compra)||0,
+
     total:cantidad*precio
 
   });
@@ -1402,7 +1333,9 @@ function finalizarVenta(){
   carrito=[];
 
   $('vCliente').value='';
+
   $('vPago').value='pagado';
+
   $('vCantidad').value=1;
 
   renderCarrito();
@@ -1419,43 +1352,50 @@ function finalizarVenta(){
 
 
 /* =====================================================
-   BORRAR VENTA
+   ELIMINAR VENTA
 ===================================================== */
 
 function eliminarVenta(id){
 
-  const v=db.ventas.find(
-    x=>String(x.id)===String(id)
+  const venta=db.ventas.find(
+    v=>String(v.id)===String(id)
   );
 
-  if(!v)return;
+  if(!venta){
+    alert('Venta no encontrada.');
+    return;
+  }
 
-  const clienteId=v.clienteId;
+  let mensaje=
+    `¿Eliminar la Venta #${String(venta.numero).padStart(6,'0')}?\n\n`+
+    `Cliente: ${venta.cliente || 'Consumidor final'}\n`+
+    `Total: ${money(venta.total)}\n\n`+
+    `El stock vendido será devuelto automáticamente.`;
 
-  const texto=
-    `¿Eliminar la Venta #${String(v.numero).padStart(6,'0')}?\n\n`+
-    `Cliente: ${v.cliente || 'Consumidor final'}\n`+
-    `Total: ${money(v.total)}\n\n`+
-    `El stock de los productos vendidos será devuelto automáticamente.\n`+
-    `Si era una venta a cuenta corriente, también se eliminará de la deuda.\n\n`+
-    `Esta acción no se puede deshacer.`;
+  if(venta.pago==='cuenta'){
+    mensaje+=
+      `\n\n⚠️ Esta venta pertenece a una cuenta corriente. `+
+      `Si ya registraste pagos de este cliente, revisá luego su estado de cuenta.`;
+  }
 
-  if(!confirm(texto))return;
+  if(!confirm(mensaje)){
+    return;
+  }
 
   /* DEVOLVER STOCK */
 
-  if(Array.isArray(v.items)){
+  if(Array.isArray(venta.items)){
 
-    v.items.forEach(item=>{
+    venta.items.forEach(item=>{
 
-      const p=db.productos.find(
-        x=>String(x.id)===String(item.id)
+      const producto=db.productos.find(
+        p=>String(p.id)===String(item.id)
       );
 
-      if(p){
+      if(producto){
 
-        p.stock=
-          Number(p.stock||0)+
+        producto.stock=
+          Number(producto.stock||0)+
           Number(item.cantidad||0);
 
       }
@@ -1464,51 +1404,19 @@ function eliminarVenta(id){
 
   }
 
+  /* ELIMINAR VENTA */
+
   db.ventas=db.ventas.filter(
-    x=>String(x.id)!==String(id)
+    v=>String(v.id)!==String(id)
   );
-
-  /*
-     Si el cliente queda sin movimientos,
-     también se elimina automáticamente.
-  */
-
-  if(clienteId){
-
-    const sigueTeniendoVentas=db.ventas.some(
-      x=>
-        String(x.clienteId)===
-        String(clienteId)
-    );
-
-    const sigueTeniendoPagos=db.pagos.some(
-      x=>
-        String(x.clienteId)===
-        String(clienteId)
-    );
-
-    if(
-      !sigueTeniendoVentas &&
-      !sigueTeniendoPagos
-    ){
-
-      db.clientes=db.clientes.filter(
-        c=>
-          String(c.id)!==
-          String(clienteId)
-      );
-
-    }
-
-  }
 
   save();
 
   $('comprobanteCard').style.display='none';
 
   alert(
-    'Venta eliminada correctamente.\n\n'+
-    'El stock fue devuelto.'
+    `Venta #${String(venta.numero).padStart(6,'0')} eliminada.\n\n`+
+    `El stock fue devuelto correctamente.`
   );
 
 }
@@ -1618,6 +1526,7 @@ async function compartir(){
       await navigator.share({
 
         title:'ByC Descartables',
+
         text:texto
 
       });
@@ -1673,6 +1582,7 @@ function registrarCompra(){
   }
 
   producto.stock+=cantidad;
+
   producto.compra=precio;
 
   db.compras.unshift({
@@ -1702,6 +1612,85 @@ function registrarCompra(){
 
   alert(
     'Compra registrada y stock actualizado.'
+  );
+
+}
+
+
+/* =====================================================
+   ELIMINAR COMPRA
+===================================================== */
+
+function eliminarCompra(id){
+
+  const compra=db.compras.find(
+    c=>String(c.id)===String(id)
+  );
+
+  if(!compra){
+    alert('Compra no encontrada.');
+    return;
+  }
+
+  const producto=db.productos.find(
+    p=>String(p.id)===String(compra.productoId)
+  );
+
+  let mensaje=
+    `¿Eliminar esta compra?\n\n`+
+    `Producto: ${compra.producto}\n`+
+    `Cantidad: ${compra.cantidad}\n`+
+    `Proveedor: ${compra.proveedor}\n`+
+    `Total: ${money(compra.total)}\n\n`;
+
+  if(producto){
+
+    mensaje+=
+      `El stock actual es: ${producto.stock}\n`+
+      `Se descontarán ${compra.cantidad} unidades del stock.`;
+
+    if(
+      Number(producto.stock) <
+      Number(compra.cantidad)
+    ){
+
+      mensaje+=
+        `\n\n⚠️ ATENCIÓN: el stock actual es menor que la cantidad comprada. `+
+        `El stock quedará en 0.`;
+    }
+
+  }else{
+
+    mensaje+=
+      `⚠️ El producto ya no existe. La compra se eliminará igualmente.`;
+  }
+
+  if(!confirm(mensaje)){
+    return;
+  }
+
+  /* CORREGIR STOCK */
+
+  if(producto){
+
+    producto.stock=Math.max(
+      0,
+      Number(producto.stock||0)-
+      Number(compra.cantidad||0)
+    );
+
+  }
+
+  /* ELIMINAR COMPRA */
+
+  db.compras=db.compras.filter(
+    c=>String(c.id)!==String(id)
+  );
+
+  save();
+
+  alert(
+    'Compra eliminada correctamente y stock actualizado.'
   );
 
 }
@@ -1764,23 +1753,21 @@ function renderCompras(){
 
             </span>
 
-            <div style="text-align:right">
+            <b>
+              ${money(x.total)}
+            </b>
 
-              <b>
-                ${money(x.total)}
-              </b>
+          </div>
 
-              <br>
+          <div class="actions">
 
-              <button
-                class="deleteButton"
-                onclick="eliminarCompra('${x.id}')">
+            <button
+              class="secondary deleteBtn"
+              onclick="eliminarCompra('${x.id}')">
 
-                🗑️ Borrar
+              🗑️ Eliminar compra
 
-              </button>
-
-            </div>
+            </button>
 
           </div>
 
@@ -1788,84 +1775,6 @@ function renderCompras(){
 
       `)
       .join('');
-
-}
-
-
-/* =====================================================
-   BORRAR COMPRA
-===================================================== */
-
-function eliminarCompra(id){
-
-  const compra=db.compras.find(
-    x=>String(x.id)===String(id)
-  );
-
-  if(!compra)return;
-
-  const producto=db.productos.find(
-    p=>String(p.id)===String(compra.productoId)
-  );
-
-  if(!confirm(
-
-    `¿Eliminar esta compra?\n\n`+
-
-    `Producto: ${compra.producto}\n`+
-    `Cantidad: ${compra.cantidad}\n`+
-    `Total: ${money(compra.total)}\n\n`+
-
-    `El stock ingresado por esta compra será descontado automáticamente.\n\n`+
-
-    `Esta acción no se puede deshacer.`
-
-  ))return;
-
-
-  /*
-     DESCONTAR DEL STOCK LA CANTIDAD
-     QUE HABÍA INGRESADO LA COMPRA
-  */
-
-  if(producto){
-
-    const stockActual=
-      Number(producto.stock||0);
-
-    if(stockActual<
-      Number(compra.cantidad||0)
-    ){
-
-      alert(
-        `No se puede borrar esta compra porque el stock actual de "${producto.nombre}" es menor que la cantidad de esta compra.\n\n`+
-        `Stock actual: ${stockActual}\n`+
-        `Cantidad de compra: ${compra.cantidad}\n\n`+
-        `Esto podría provocar un stock negativo.`
-      );
-
-      return;
-    }
-
-    producto.stock=
-      stockActual-
-      Number(compra.cantidad||0);
-
-  }
-
-
-  db.compras=db.compras.filter(
-    x=>String(x.id)!==String(id)
-  );
-
-
-  save();
-
-
-  alert(
-    'Compra eliminada correctamente.\n\n'+
-    'El stock fue ajustado.'
-  );
 
 }
 
@@ -1928,7 +1837,6 @@ function renderVentas(){
 
           </div>
 
-
           <div class="row">
 
             <span>
@@ -1941,26 +1849,25 @@ function renderVentas(){
 
             </span>
 
+            <button
+              class="secondary"
+              onclick="verVenta('${v.id}')">
 
-            <div>
+              👁️ Detalle
 
-              <button
-                class="secondary"
-                onclick="verVenta('${v.id}')">
+            </button>
 
-                👁️ Detalle
+          </div>
 
-              </button>
+          <div class="actions">
 
-              <button
-                class="deleteButton"
-                onclick="eliminarVenta('${v.id}')">
+            <button
+              class="secondary deleteBtn"
+              onclick="eliminarVenta('${v.id}')">
 
-                🗑️
+              🗑️ Eliminar venta
 
-              </button>
-
-            </div>
+            </button>
 
           </div>
 
@@ -1985,6 +1892,7 @@ function verVenta(id){
   if(!v){
 
     alert('Venta no encontrada.');
+
     return;
   }
 
@@ -2090,6 +1998,7 @@ function registrarPago(clienteId){
   ){
 
     alert('Importe inválido.');
+
     return;
   }
 
@@ -2114,6 +2023,7 @@ function registrarPago(clienteId){
   if(!fechaPago){
 
     alert('Tenés que indicar una fecha.');
+
     return;
   }
 
@@ -2203,58 +2113,36 @@ function registrarPago(clienteId){
 
 
 /* =====================================================
-   BORRAR PAGO
+   ELIMINAR PAGO
 ===================================================== */
 
-function eliminarPago(pagoId){
+function eliminarPago(id){
 
   const pago=db.pagos.find(
-    p=>String(p.id)===String(pagoId)
+    p=>String(p.id)===String(id)
   );
 
-  if(!pago)return;
-
-  const cliente=obtenerCliente(
-    pago.clienteId
-  );
-
-  const saldoActual=saldoCliente(
-    pago.clienteId
-  );
+  if(!pago){
+    alert('Pago no encontrado.');
+    return;
+  }
 
   if(!confirm(
 
     `¿Eliminar este pago?\n\n`+
-
     `Cliente: ${pago.cliente}\n`+
-    `Fecha: ${new Date(pago.fecha).toLocaleDateString('es-AR')}\n`+
     `Importe: ${money(pago.importe)}\n`+
-    `Detalle: ${pago.detalle}\n\n`+
-
-    `Al eliminarlo, la deuda del cliente aumentará en ${money(pago.importe)}.\n`+
-
-    `Saldo actual: ${money(saldoActual)}\n`+
-    `Nuevo saldo: ${money(saldoActual+Number(pago.importe||0))}\n\n`+
-
+    `Fecha: ${new Date(pago.fecha).toLocaleDateString('es-AR')}\n`+
+    `Detalle: ${pago.detalle || 'Pago'}\n\n`+
     `Esta acción no se puede deshacer.`
 
   ))return;
 
-
   db.pagos=db.pagos.filter(
-    p=>String(p.id)!==String(pagoId)
+    p=>String(p.id)!==String(id)
   );
 
-
   save();
-
-
-  if(cliente){
-
-    verEstadoCuenta(cliente.id);
-
-  }
-
 
   alert(
     'Pago eliminado correctamente.'
@@ -2305,7 +2193,6 @@ function verEstadoCuenta(clienteId){
 
     });
 
-
   db.pagos
     .filter(p=>
       String(p.clienteId)===
@@ -2333,16 +2220,13 @@ function verEstadoCuenta(clienteId){
 
     });
 
-
   movimientos.sort(
     (a,b)=>
       new Date(a.fecha)-
       new Date(b.fecha)
   );
 
-
   let saldo=0;
-
 
   const filas=
     movimientos.map(m=>{
@@ -2377,9 +2261,7 @@ function verEstadoCuenta(clienteId){
             ${
               m.importe>=0
               ?money(m.importe)
-              :'-'+money(
-                Math.abs(m.importe)
-              )
+              :'-'+money(Math.abs(m.importe))
             }
 
           </td>
@@ -2396,22 +2278,14 @@ function verEstadoCuenta(clienteId){
               m.clase==='pago'
               ?`
                 <button
-                  class="deleteButton"
+                  class="secondary deleteBtn"
                   onclick="eliminarPago('${m.id}')">
 
                   🗑️
 
                 </button>
               `
-              :`
-                <button
-                  class="deleteButton"
-                  onclick="eliminarVenta('${m.id}')">
-
-                  🗑️
-
-                </button>
-              `
+              :''
             }
 
           </td>
@@ -2421,7 +2295,6 @@ function verEstadoCuenta(clienteId){
       `;
 
     }).join('');
-
 
   $('cuentasCorrientes').innerHTML=`
 
@@ -2447,7 +2320,6 @@ function verEstadoCuenta(clienteId){
 
         </div>
 
-
         <div class="stat">
 
           Pagos
@@ -2466,7 +2338,6 @@ function verEstadoCuenta(clienteId){
 
       </div>
 
-
       <div class="card">
 
         <h2>
@@ -2479,7 +2350,6 @@ function verEstadoCuenta(clienteId){
           )}
 
         </h2>
-
 
         ${
           saldoCliente(cliente.id)>0
@@ -2501,21 +2371,7 @@ function verEstadoCuenta(clienteId){
 
       </div>
 
-
-      <div class="row">
-
-        <h3>Movimientos</h3>
-
-        <button
-          class="deleteButton"
-          onclick="eliminarCliente('${cliente.id}')">
-
-          🗑️ Borrar cliente
-
-        </button>
-
-      </div>
-
+      <h3>Movimientos</h3>
 
       <table>
 
@@ -2533,12 +2389,9 @@ function verEstadoCuenta(clienteId){
             Saldo
           </th>
 
-          <th>
-            Borrar
-          </th>
+          <th></th>
 
         </tr>
-
 
         ${
           filas ||
@@ -2615,7 +2468,6 @@ function renderCuentas(){
 
         </span>
 
-
         <div>
 
           <button
@@ -2625,7 +2477,6 @@ function renderCuentas(){
             📒 Estado
 
           </button>
-
 
           <button
             class="secondary"
@@ -2729,7 +2580,6 @@ function renderRentabilidad(){
 
       </div>
 
-
       <div class="stat">
 
         Costo vendido
@@ -2740,7 +2590,6 @@ function renderRentabilidad(){
 
       </div>
 
-
       <div class="stat">
 
         Ganancia
@@ -2750,7 +2599,6 @@ function renderRentabilidad(){
         </b>
 
       </div>
-
 
       <div class="stat">
 
@@ -2865,7 +2713,7 @@ function exportarDatos(){
 
   const copia={
 
-    version:4,
+    version:5,
 
     exportadoEn:
       new Date().toISOString(),
@@ -3027,9 +2875,13 @@ function esc(s){
       m=>({
 
         '&':'&amp;',
+
         '<':'&lt;',
+
         '>':'&gt;',
+
         '"':'&quot;',
+
         "'":'&#39;'
 
       }[m])
