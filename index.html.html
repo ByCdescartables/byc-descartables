@@ -205,6 +205,24 @@ th,td{
   margin-top:3px
 }
 
+.deleteButton{
+  background:#fff0f0;
+  color:#b00020;
+  border:1px solid #f0caca;
+  border-radius:8px;
+  padding:7px 9px;
+  cursor:pointer
+}
+
+.editButton{
+  background:#eee;
+  color:#222;
+  border:0;
+  border-radius:8px;
+  padding:7px 9px;
+  cursor:pointer
+}
+
 @media(max-width:600px){
 
   header{padding:14px 12px}
@@ -270,10 +288,6 @@ th,td{
 
 <main>
 
-<!-- =====================================================
-     INICIO
-===================================================== -->
-
 <section id="inicio" class="page active">
 
   <div class="grid">
@@ -315,10 +329,6 @@ th,td{
 </section>
 
 
-<!-- =====================================================
-     PRODUCTOS
-===================================================== -->
-
 <section id="productos" class="page">
 
   <div class="card">
@@ -354,10 +364,6 @@ th,td{
 </section>
 
 
-<!-- =====================================================
-     VENTAS
-===================================================== -->
-
 <section id="ventas" class="page">
 
   <div class="card">
@@ -365,10 +371,7 @@ th,td{
     <h2>🛒 Nueva venta</h2>
 
     <label>Cliente</label>
-    <input
-      id="vCliente"
-      placeholder="Consumidor final"
-    >
+    <input id="vCliente" placeholder="Consumidor final">
 
     <label>Forma de pago</label>
 
@@ -430,15 +433,11 @@ th,td{
 
     <div class="actions">
 
-      <button
-        class="secondary"
-        onclick="window.print()">
+      <button class="secondary" onclick="window.print()">
         🖨️ Imprimir / PDF
       </button>
 
-      <button
-        class="secondary"
-        onclick="compartir()">
+      <button class="secondary" onclick="compartir()">
         📲 Compartir
       </button>
 
@@ -457,10 +456,6 @@ th,td{
 
 </section>
 
-
-<!-- =====================================================
-     COMPRAS
-===================================================== -->
 
 <section id="compras" class="page">
 
@@ -516,10 +511,6 @@ th,td{
 </section>
 
 
-<!-- =====================================================
-     REPORTES / CUENTA CORRIENTE
-===================================================== -->
-
 <section id="reportes" class="page">
 
   <div class="card">
@@ -541,10 +532,6 @@ th,td{
 
 </section>
 
-
-<!-- =====================================================
-     DATOS
-===================================================== -->
 
 <section id="datos" class="page">
 
@@ -595,15 +582,10 @@ th,td{
 
 <script>
 
-/* =====================================================
-   BASE DE DATOS
-===================================================== */
-
 const KEY='byc_demo_v3';
 const OLD_KEY='byc_demo_v2';
 
 let carrito=[];
-
 let db=null;
 
 try{
@@ -700,7 +682,6 @@ function localDateISO(d=new Date()){
 
 
 const today=()=>localDateISO();
-
 const month=()=>today().slice(0,7);
 
 
@@ -758,17 +739,9 @@ function agregarProducto(){
 
   const nombre=$('pNombre').value.trim();
 
-  const compra=Number(
-    $('pCompra').value
-  );
-
-  const venta=Number(
-    $('pVenta').value
-  );
-
-  const stock=Number(
-    $('pStock').value
-  );
+  const compra=Number($('pCompra').value);
+  const venta=Number($('pVenta').value);
+  const stock=Number($('pStock').value);
 
   if(
     !nombre ||
@@ -780,10 +753,7 @@ function agregarProducto(){
     stock<0
   ){
 
-    alert(
-      'Completá todos los datos correctamente.'
-    );
-
+    alert('Completá todos los datos correctamente.');
     return;
   }
 
@@ -792,11 +762,8 @@ function agregarProducto(){
     id:Date.now()+Math.random(),
 
     nombre:nombre,
-
     compra:compra,
-
     venta:venta,
-
     stock:stock
 
   });
@@ -859,13 +826,13 @@ function renderProductos(){
             <td>
 
               <button
-                class="secondary"
+                class="editButton"
                 onclick="editarProducto('${p.id}')">
                 ✏️
               </button>
 
               <button
-                class="secondary danger"
+                class="deleteButton"
                 onclick="eliminarProducto('${p.id}')">
                 🗑️
               </button>
@@ -891,14 +858,12 @@ function editarProducto(id){
 
   if(!p)return;
 
-
   const nombre=prompt(
     'Nombre del producto:',
     p.nombre
   );
 
   if(nombre===null)return;
-
 
   const venta=prompt(
     'Precio de venta:',
@@ -907,14 +872,12 @@ function editarProducto(id){
 
   if(venta===null)return;
 
-
   const compra=prompt(
     'Precio de compra:',
     p.compra
   );
 
   if(compra===null)return;
-
 
   const stock=prompt(
     'Stock:',
@@ -923,11 +886,9 @@ function editarProducto(id){
 
   if(stock===null)return;
 
-
   const pv=Number(venta);
   const pc=Number(compra);
   const st=Number(stock);
-
 
   if(
     !nombre.trim() ||
@@ -940,16 +901,13 @@ function editarProducto(id){
   ){
 
     alert('Datos inválidos.');
-
     return;
   }
-
 
   p.nombre=nombre.trim();
   p.venta=pv;
   p.compra=pc;
   p.stock=st;
-
 
   save();
 
@@ -966,21 +924,37 @@ function eliminarProducto(id){
 
   if(!p)return;
 
+  const usadoEnVentas=db.ventas.some(v=>
+    v.items?.some(i=>
+      String(i.id)===String(id)
+    )
+  );
 
-  if(!confirm(
-    `¿Eliminar "${p.nombre}"?`
-  ))return;
+  const usadoEnCompras=db.compras.some(c=>
+    String(c.productoId)===String(id)
+  );
 
+  let mensaje=
+    `¿Eliminar "${p.nombre}"?\n\n`;
+
+  if(usadoEnVentas || usadoEnCompras){
+
+    mensaje+=
+      'Este producto aparece en ventas o compras históricas.\n'+
+      'Los movimientos históricos NO se eliminarán.\n\n';
+  }
+
+  mensaje+='Esta acción no se puede deshacer.';
+
+  if(!confirm(mensaje))return;
 
   db.productos=db.productos.filter(
     x=>String(x.id)!==String(id)
   );
 
-
   carrito=carrito.filter(
     x=>String(x.id)!==String(id)
   );
-
 
   save();
 
@@ -1005,19 +979,15 @@ function renderSelects(){
 
   `).join('');
 
-
   $('vProducto').innerHTML=
     opts ||
     '<option value="">No hay productos</option>';
-
 
   $('cProducto').innerHTML=
     opts ||
     '<option value="">No hay productos</option>';
 
-
   mostrarPrecio();
-
   mostrarPrecioCompra();
 
 }
@@ -1029,18 +999,14 @@ function mostrarPrecio(){
     x=>String(x.id)===$('vProducto').value
   );
 
-
   if(!p){
 
     $('vPrecio').value='';
     $('vInfo').textContent='';
-
     return;
   }
 
-
   $('vPrecio').value=p.venta;
-
 
   $('vInfo').textContent=
     `Precio habitual: ${money(p.venta)} · Stock disponible: ${p.stock}. `+
@@ -1055,11 +1021,8 @@ function mostrarPrecioCompra(){
     x=>String(x.id)===$('cProducto').value
   );
 
-
   if(p){
-
     $('cPrecio').value=p.compra;
-
   }
 
 }
@@ -1085,25 +1048,20 @@ function registrarCliente(nombre){
 
   if(!nombre)return null;
 
-
   const existente=db.clientes.find(
     c=>
       normalizarCliente(c.nombre)===
       normalizarCliente(nombre)
   );
 
-
   if(existente)return existente;
-
 
   const cliente={
 
     id:Date.now()+Math.random(),
-
     nombre:nombre
 
   };
-
 
   db.clientes.push(cliente);
 
@@ -1122,6 +1080,59 @@ function obtenerCliente(id){
 
 
 /* =====================================================
+   BORRAR CLIENTE
+===================================================== */
+
+function eliminarCliente(clienteId){
+
+  const cliente=db.clientes.find(
+    c=>String(c.id)===String(clienteId)
+  );
+
+  if(!cliente)return;
+
+  const ventas=totalVentasCliente(cliente.id);
+  const pagos=totalPagosCliente(cliente.id);
+  const saldo=ventas-pagos;
+
+  const tieneVentas=db.ventas.some(v=>
+    String(v.clienteId)===String(cliente.id)
+  );
+
+  const tienePagos=db.pagos.some(p=>
+    String(p.clienteId)===String(cliente.id)
+  );
+
+  if(tieneVentas || tienePagos){
+
+    alert(
+      `No se puede eliminar a "${cliente.nombre}" porque tiene movimientos registrados.\n\n`+
+      `Ventas a cuenta: ${money(ventas)}\n`+
+      `Pagos: ${money(pagos)}\n`+
+      `Saldo: ${money(saldo)}\n\n`+
+      `Para conservar la historia, primero eliminá individualmente sus movimientos.`
+    );
+
+    return;
+  }
+
+  if(!confirm(
+    `¿Eliminar al cliente "${cliente.nombre}"?\n\n`+
+    `Esta acción no se puede deshacer.`
+  ))return;
+
+  db.clientes=db.clientes.filter(
+    c=>String(c.id)!==String(cliente.id)
+  );
+
+  save();
+
+  alert('Cliente eliminado.');
+
+}
+
+
+/* =====================================================
    VENTAS
 ===================================================== */
 
@@ -1131,16 +1142,13 @@ function agregarAlCarrito(){
     p=>String(p.id)===$('vProducto').value
   );
 
-
   const cantidad=Number(
     $('vCantidad').value
   );
 
-
   const precio=Number(
     $('vPrecio').value
   );
-
 
   if(
     !producto ||
@@ -1151,10 +1159,8 @@ function agregarAlCarrito(){
   ){
 
     alert('Completá los datos de la venta.');
-
     return;
   }
-
 
   const ya=carrito
     .filter(x=>x.id===producto.id)
@@ -1162,7 +1168,6 @@ function agregarAlCarrito(){
       (a,x)=>a+x.cantidad,
       0
     );
-
 
   if(
     cantidad+ya>
@@ -1177,23 +1182,16 @@ function agregarAlCarrito(){
     return;
   }
 
-
   carrito.push({
 
     id:producto.id,
-
     nombre:producto.nombre,
-
     cantidad:cantidad,
-
     precio:precio,
-
     costo:Number(producto.compra)||0,
-
     total:cantidad*precio
 
   });
-
 
   renderCarrito();
 
@@ -1204,7 +1202,6 @@ function renderCarrito(){
 
   const el=$('carrito');
 
-
   if(!carrito.length){
 
     el.innerHTML=
@@ -1213,12 +1210,10 @@ function renderCarrito(){
     return;
   }
 
-
   const total=carrito.reduce(
     (a,x)=>a+x.total,
     0
   );
-
 
   el.innerHTML=`
 
@@ -1295,30 +1290,23 @@ function finalizarVenta(){
     return;
   }
 
-
   const total=carrito.reduce(
     (a,x)=>a+x.total,
     0
   );
 
-
   const costo=carrito.reduce(
-    (a,x)=>a+
-      x.costo*x.cantidad,
+    (a,x)=>a+x.costo*x.cantidad,
     0
   );
-
 
   const nombreCliente=
     $('vCliente').value.trim() ||
     'Consumidor final';
 
-
   const formaPago=$('vPago').value;
 
-
   let cliente=null;
-
 
   if(
     formaPago==='cuenta' ||
@@ -1331,7 +1319,6 @@ function finalizarVenta(){
 
   }
 
-
   if(
     formaPago==='cuenta' &&
     !cliente
@@ -1343,7 +1330,6 @@ function finalizarVenta(){
 
     return;
   }
-
 
   for(const item of carrito){
 
@@ -1365,7 +1351,6 @@ function finalizarVenta(){
 
   }
 
-
   carrito.forEach(item=>{
 
     const p=db.productos.find(
@@ -1376,9 +1361,7 @@ function finalizarVenta(){
 
   });
 
-
   db.numeroVenta++;
-
 
   const venta={
 
@@ -1412,31 +1395,120 @@ function finalizarVenta(){
 
   };
 
-
   db.ventas.unshift(venta);
 
-
   save();
-
 
   carrito=[];
 
   $('vCliente').value='';
-
   $('vPago').value='pagado';
-
   $('vCantidad').value=1;
-
 
   renderCarrito();
 
   mostrarComprobante(venta);
 
-
   alert(
     formaPago==='cuenta'
     ?'Venta registrada en cuenta corriente.'
     :'Venta registrada como pagada.'
+  );
+
+}
+
+
+/* =====================================================
+   BORRAR VENTA
+===================================================== */
+
+function eliminarVenta(id){
+
+  const v=db.ventas.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!v)return;
+
+  const clienteId=v.clienteId;
+
+  const texto=
+    `¿Eliminar la Venta #${String(v.numero).padStart(6,'0')}?\n\n`+
+    `Cliente: ${v.cliente || 'Consumidor final'}\n`+
+    `Total: ${money(v.total)}\n\n`+
+    `El stock de los productos vendidos será devuelto automáticamente.\n`+
+    `Si era una venta a cuenta corriente, también se eliminará de la deuda.\n\n`+
+    `Esta acción no se puede deshacer.`;
+
+  if(!confirm(texto))return;
+
+  /* DEVOLVER STOCK */
+
+  if(Array.isArray(v.items)){
+
+    v.items.forEach(item=>{
+
+      const p=db.productos.find(
+        x=>String(x.id)===String(item.id)
+      );
+
+      if(p){
+
+        p.stock=
+          Number(p.stock||0)+
+          Number(item.cantidad||0);
+
+      }
+
+    });
+
+  }
+
+  db.ventas=db.ventas.filter(
+    x=>String(x.id)!==String(id)
+  );
+
+  /*
+     Si el cliente queda sin movimientos,
+     también se elimina automáticamente.
+  */
+
+  if(clienteId){
+
+    const sigueTeniendoVentas=db.ventas.some(
+      x=>
+        String(x.clienteId)===
+        String(clienteId)
+    );
+
+    const sigueTeniendoPagos=db.pagos.some(
+      x=>
+        String(x.clienteId)===
+        String(clienteId)
+    );
+
+    if(
+      !sigueTeniendoVentas &&
+      !sigueTeniendoPagos
+    ){
+
+      db.clientes=db.clientes.filter(
+        c=>
+          String(c.id)!==
+          String(clienteId)
+      );
+
+    }
+
+  }
+
+  save();
+
+  $('comprobanteCard').style.display='none';
+
+  alert(
+    'Venta eliminada correctamente.\n\n'+
+    'El stock fue devuelto.'
   );
 
 }
@@ -1452,12 +1524,10 @@ function mostrarComprobante(v){
     new Date(v.fecha)
     .toLocaleString('es-AR');
 
-
   const formaPago=
     v.pago==='cuenta'
     ?'📒 CUENTA CORRIENTE'
     :'💵 PAGADO';
-
 
   $('comprobante').innerHTML=`
 
@@ -1520,9 +1590,7 @@ function mostrarComprobante(v){
 
   `;
 
-
   $('comprobanteCard').style.display='block';
-
 
   setTimeout(()=>{
 
@@ -1543,7 +1611,6 @@ async function compartir(){
       .querySelector('.receipt')
       ?.innerText || '';
 
-
   if(navigator.share){
 
     try{
@@ -1551,7 +1618,6 @@ async function compartir(){
       await navigator.share({
 
         title:'ByC Descartables',
-
         text:texto
 
       });
@@ -1578,21 +1644,17 @@ function registrarCompra(){
   const proveedor=
     $('cProveedor').value.trim();
 
-
   const producto=db.productos.find(
     p=>String(p.id)===$('cProducto').value
   );
-
 
   const cantidad=Number(
     $('cCantidad').value
   );
 
-
   const precio=Number(
     $('cPrecio').value
   );
-
 
   if(
     !proveedor ||
@@ -1610,11 +1672,8 @@ function registrarCompra(){
     return;
   }
 
-
   producto.stock+=cantidad;
-
   producto.compra=precio;
-
 
   db.compras.unshift({
 
@@ -1636,14 +1695,10 @@ function registrarCompra(){
 
   });
 
-
   save();
 
-
   $('cProveedor').value='';
-
   $('cCantidad').value=1;
-
 
   alert(
     'Compra registrada y stock actualizado.'
@@ -1656,7 +1711,6 @@ function renderCompras(){
 
   const el=$('listaCompras');
 
-
   if(!db.compras.length){
 
     el.innerHTML=
@@ -1664,7 +1718,6 @@ function renderCompras(){
 
     return;
   }
-
 
   el.innerHTML=
     db.compras
@@ -1711,9 +1764,23 @@ function renderCompras(){
 
             </span>
 
-            <b>
-              ${money(x.total)}
-            </b>
+            <div style="text-align:right">
+
+              <b>
+                ${money(x.total)}
+              </b>
+
+              <br>
+
+              <button
+                class="deleteButton"
+                onclick="eliminarCompra('${x.id}')">
+
+                🗑️ Borrar
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -1726,13 +1793,90 @@ function renderCompras(){
 
 
 /* =====================================================
+   BORRAR COMPRA
+===================================================== */
+
+function eliminarCompra(id){
+
+  const compra=db.compras.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!compra)return;
+
+  const producto=db.productos.find(
+    p=>String(p.id)===String(compra.productoId)
+  );
+
+  if(!confirm(
+
+    `¿Eliminar esta compra?\n\n`+
+
+    `Producto: ${compra.producto}\n`+
+    `Cantidad: ${compra.cantidad}\n`+
+    `Total: ${money(compra.total)}\n\n`+
+
+    `El stock ingresado por esta compra será descontado automáticamente.\n\n`+
+
+    `Esta acción no se puede deshacer.`
+
+  ))return;
+
+
+  /*
+     DESCONTAR DEL STOCK LA CANTIDAD
+     QUE HABÍA INGRESADO LA COMPRA
+  */
+
+  if(producto){
+
+    const stockActual=
+      Number(producto.stock||0);
+
+    if(stockActual<
+      Number(compra.cantidad||0)
+    ){
+
+      alert(
+        `No se puede borrar esta compra porque el stock actual de "${producto.nombre}" es menor que la cantidad de esta compra.\n\n`+
+        `Stock actual: ${stockActual}\n`+
+        `Cantidad de compra: ${compra.cantidad}\n\n`+
+        `Esto podría provocar un stock negativo.`
+      );
+
+      return;
+    }
+
+    producto.stock=
+      stockActual-
+      Number(compra.cantidad||0);
+
+  }
+
+
+  db.compras=db.compras.filter(
+    x=>String(x.id)!==String(id)
+  );
+
+
+  save();
+
+
+  alert(
+    'Compra eliminada correctamente.\n\n'+
+    'El stock fue ajustado.'
+  );
+
+}
+
+
+/* =====================================================
    VENTAS LISTADO
 ===================================================== */
 
 function renderVentas(){
 
   const el=$('listaVentas');
-
 
   if(!db.ventas.length){
 
@@ -1741,7 +1885,6 @@ function renderVentas(){
 
     return;
   }
-
 
   el.innerHTML=
     db.ventas
@@ -1799,13 +1942,25 @@ function renderVentas(){
             </span>
 
 
-            <button
-              class="secondary"
-              onclick="verVenta('${v.id}')">
+            <div>
 
-              👁️ Detalle
+              <button
+                class="secondary"
+                onclick="verVenta('${v.id}')">
 
-            </button>
+                👁️ Detalle
+
+              </button>
+
+              <button
+                class="deleteButton"
+                onclick="eliminarVenta('${v.id}')">
+
+                🗑️
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -1827,17 +1982,13 @@ function verVenta(id){
     x=>String(x.id)===String(id)
   );
 
-
   if(!v){
 
     alert('Venta no encontrada.');
-
     return;
   }
 
-
   mostrarComprobante(v);
-
 
   $('comprobanteCard')
     .scrollIntoView({
@@ -1902,14 +2053,11 @@ function registrarPago(clienteId){
     c=>String(c.id)===String(clienteId)
   );
 
-
   if(!cliente)return;
-
 
   const saldo=saldoCliente(
     cliente.id
   );
-
 
   if(saldo<=0){
 
@@ -1920,7 +2068,6 @@ function registrarPago(clienteId){
     return;
   }
 
-
   const respuesta=prompt(
 
     `Cliente: ${cliente.nombre}\n`+
@@ -1929,9 +2076,7 @@ function registrarPago(clienteId){
 
   );
 
-
   if(respuesta===null)return;
-
 
   let importe=Number(
     String(respuesta)
@@ -1939,17 +2084,14 @@ function registrarPago(clienteId){
       .replace(',','.')
   );
 
-
   if(
     !Number.isFinite(importe) ||
     importe<=0
   ){
 
     alert('Importe inválido.');
-
     return;
   }
-
 
   if(importe>saldo){
 
@@ -1960,43 +2102,30 @@ function registrarPago(clienteId){
     return;
   }
 
-
-  /* =================================================
-     FECHA DEL PAGO
-  ================================================= */
-
   let fechaPago=prompt(
     'Fecha de pago (DD/MM/AAAA):',
     new Date().toLocaleDateString('es-AR')
   );
 
-
   if(fechaPago===null)return;
 
-
   fechaPago=fechaPago.trim();
-
 
   if(!fechaPago){
 
     alert('Tenés que indicar una fecha.');
-
     return;
   }
 
-
   const partes=fechaPago.split('/');
 
-
   let fechaISO='';
-
 
   if(partes.length===3){
 
     const dia=Number(partes[0]);
     const mes=Number(partes[1]);
     const anio=Number(partes[2]);
-
 
     if(
       dia>=1 &&
@@ -2016,7 +2145,6 @@ function registrarPago(clienteId){
 
   }
 
-
   if(!fechaISO){
 
     alert(
@@ -2025,11 +2153,6 @@ function registrarPago(clienteId){
 
     return;
   }
-
-
-  /* =================================================
-     DETALLE DEL PAGO
-  ================================================= */
 
   const detalle=prompt(
 
@@ -2045,13 +2168,10 @@ function registrarPago(clienteId){
 
   );
 
-
   if(detalle===null)return;
-
 
   const detalleFinal=
     detalle.trim() || 'Pago';
-
 
   db.pagos.unshift({
 
@@ -2069,9 +2189,7 @@ function registrarPago(clienteId){
 
   });
 
-
   save();
-
 
   alert(
 
@@ -2079,6 +2197,67 @@ function registrarPago(clienteId){
     `Pagó: ${money(importe)}\n`+
     `Saldo restante: ${money(saldo-importe)}`
 
+  );
+
+}
+
+
+/* =====================================================
+   BORRAR PAGO
+===================================================== */
+
+function eliminarPago(pagoId){
+
+  const pago=db.pagos.find(
+    p=>String(p.id)===String(pagoId)
+  );
+
+  if(!pago)return;
+
+  const cliente=obtenerCliente(
+    pago.clienteId
+  );
+
+  const saldoActual=saldoCliente(
+    pago.clienteId
+  );
+
+  if(!confirm(
+
+    `¿Eliminar este pago?\n\n`+
+
+    `Cliente: ${pago.cliente}\n`+
+    `Fecha: ${new Date(pago.fecha).toLocaleDateString('es-AR')}\n`+
+    `Importe: ${money(pago.importe)}\n`+
+    `Detalle: ${pago.detalle}\n\n`+
+
+    `Al eliminarlo, la deuda del cliente aumentará en ${money(pago.importe)}.\n`+
+
+    `Saldo actual: ${money(saldoActual)}\n`+
+    `Nuevo saldo: ${money(saldoActual+Number(pago.importe||0))}\n\n`+
+
+    `Esta acción no se puede deshacer.`
+
+  ))return;
+
+
+  db.pagos=db.pagos.filter(
+    p=>String(p.id)!==String(pagoId)
+  );
+
+
+  save();
+
+
+  if(cliente){
+
+    verEstadoCuenta(cliente.id);
+
+  }
+
+
+  alert(
+    'Pago eliminado correctamente.'
   );
 
 }
@@ -2094,12 +2273,9 @@ function verEstadoCuenta(clienteId){
     c=>String(c.id)===String(clienteId)
   );
 
-
   if(!cliente)return;
 
-
   const movimientos=[];
-
 
   db.ventas
     .filter(v=>
@@ -2111,6 +2287,8 @@ function verEstadoCuenta(clienteId){
 
       movimientos.push({
 
+        id:v.id,
+
         fecha:v.fecha,
 
         tipo:
@@ -2119,7 +2297,9 @@ function verEstadoCuenta(clienteId){
 
         importe:Number(v.total||0),
 
-        detalle:'Venta a cuenta corriente'
+        detalle:'Venta a cuenta corriente',
+
+        clase:'venta'
 
       });
 
@@ -2135,6 +2315,8 @@ function verEstadoCuenta(clienteId){
 
       movimientos.push({
 
+        id:p.id,
+
         fecha:p.fecha,
 
         tipo:'💵 Pago',
@@ -2143,7 +2325,9 @@ function verEstadoCuenta(clienteId){
           -Number(p.importe||0),
 
         detalle:
-          p.detalle || 'Pago'
+          p.detalle || 'Pago',
+
+        clase:'pago'
 
       });
 
@@ -2164,10 +2348,6 @@ function verEstadoCuenta(clienteId){
     movimientos.map(m=>{
 
       saldo+=m.importe;
-
-
-      const esPago=m.importe<0;
-
 
       return `
 
@@ -2207,6 +2387,32 @@ function verEstadoCuenta(clienteId){
           <td class="right">
 
             ${money(saldo)}
+
+          </td>
+
+          <td>
+
+            ${
+              m.clase==='pago'
+              ?`
+                <button
+                  class="deleteButton"
+                  onclick="eliminarPago('${m.id}')">
+
+                  🗑️
+
+                </button>
+              `
+              :`
+                <button
+                  class="deleteButton"
+                  onclick="eliminarVenta('${m.id}')">
+
+                  🗑️
+
+                </button>
+              `
+            }
 
           </td>
 
@@ -2296,7 +2502,19 @@ function verEstadoCuenta(clienteId){
       </div>
 
 
-      <h3>Movimientos</h3>
+      <div class="row">
+
+        <h3>Movimientos</h3>
+
+        <button
+          class="deleteButton"
+          onclick="eliminarCliente('${cliente.id}')">
+
+          🗑️ Borrar cliente
+
+        </button>
+
+      </div>
 
 
       <table>
@@ -2315,6 +2533,10 @@ function verEstadoCuenta(clienteId){
             Saldo
           </th>
 
+          <th>
+            Borrar
+          </th>
+
         </tr>
 
 
@@ -2324,7 +2546,7 @@ function verEstadoCuenta(clienteId){
             <tr>
 
               <td
-                colspan="4"
+                colspan="5"
                 class="muted">
 
                 Sin movimientos.
@@ -2355,9 +2577,7 @@ function renderCuentas(){
       c=>saldoCliente(c.id)>0
     );
 
-
   const el=$('cuentasCorrientes');
-
 
   if(!pendientes.length){
 
@@ -2366,7 +2586,6 @@ function renderCuentas(){
 
     return;
   }
-
 
   el.innerHTML=
     pendientes.map(c=>`
@@ -2429,12 +2648,10 @@ function renderInicioCuentas(){
 
   const el=$('inicioCuentas');
 
-
   const pendientes=
     db.clientes.filter(
       c=>saldoCliente(c.id)>0
     );
-
 
   if(!pendientes.length){
 
@@ -2443,7 +2660,6 @@ function renderInicioCuentas(){
 
     return;
   }
-
 
   el.innerHTML=
     pendientes.map(c=>`
@@ -2479,30 +2695,25 @@ function renderRentabilidad(){
       month()
   );
 
-
   const ventas=ventasMes.reduce(
     (a,v)=>a+Number(v.total||0),
     0
   );
-
 
   const costo=ventasMes.reduce(
     (a,v)=>a+Number(v.costo||0),
     0
   );
 
-
   const ganancia=ventasMes.reduce(
     (a,v)=>a+Number(v.ganancia||0),
     0
   );
 
-
   const rentabilidad=
     ventas
     ?ganancia/ventas*100
     :0;
-
 
   $('resumenRentabilidad').innerHTML=`
 
@@ -2570,13 +2781,11 @@ function renderInicio(){
       today()
   );
 
-
   const ventasMes=db.ventas.filter(
     v=>
       String(v.fecha).slice(0,7)===
       month()
   );
-
 
   $('hoyVentas').textContent=
     money(
@@ -2586,7 +2795,6 @@ function renderInicio(){
       )
     );
 
-
   $('hoyGanancia').textContent=
     money(
       ventasHoy.reduce(
@@ -2594,7 +2802,6 @@ function renderInicio(){
         0
       )
     );
-
 
   $('mesVentas').textContent=
     money(
@@ -2604,7 +2811,6 @@ function renderInicio(){
       )
     );
 
-
   $('mesGanancia').textContent=
     money(
       ventasMes.reduce(
@@ -2613,11 +2819,9 @@ function renderInicio(){
       )
     );
 
-
   const bajos=db.productos.filter(
     p=>Number(p.stock)<=5
   );
-
 
   $('stockBajo').innerHTML=
     bajos.length
@@ -2670,7 +2874,6 @@ function exportarDatos(){
 
   };
 
-
   const blob=new Blob(
 
     [
@@ -2687,28 +2890,22 @@ function exportarDatos(){
 
   );
 
-
   const url=
     URL.createObjectURL(blob);
-
 
   const a=
     document.createElement('a');
 
-
   a.href=url;
-
 
   a.download=
     `ByC_Descartables_backup_${today()}.json`;
-
 
   document.body.appendChild(a);
 
   a.click();
 
   a.remove();
-
 
   setTimeout(
     ()=>URL.revokeObjectURL(url),
@@ -2727,13 +2924,10 @@ function importarDatos(ev){
   const file=
     ev.target.files?.[0];
 
-
   if(!file)return;
-
 
   const reader=
     new FileReader();
-
 
   reader.onload=()=>{
 
@@ -2744,10 +2938,8 @@ function importarDatos(ev){
           reader.result
         );
 
-
       const nuevo=
         raw?.db || raw;
-
 
       if(
         !nuevo ||
@@ -2762,11 +2954,9 @@ function importarDatos(ev){
 
       }
 
-
       if(!confirm(
         'Esto reemplazará los datos actuales. ¿Continuar?'
       ))return;
-
 
       db={
 
@@ -2794,23 +2984,18 @@ function importarDatos(ev){
 
       };
 
-
       localStorage.setItem(
         KEY,
         JSON.stringify(db)
       );
 
-
       carrito=[];
 
-
       renderAll();
-
 
       alert(
         'Datos importados correctamente.'
       );
-
 
     }catch(e){
 
@@ -2820,11 +3005,9 @@ function importarDatos(ev){
 
     }
 
-
     ev.target.value='';
 
   };
-
 
   reader.readAsText(file);
 
@@ -2844,13 +3027,9 @@ function esc(s){
       m=>({
 
         '&':'&amp;',
-
         '<':'&lt;',
-
         '>':'&gt;',
-
         '"':'&quot;',
-
         "'":'&#39;'
 
       }[m])
@@ -2901,18 +3080,15 @@ document.addEventListener(
         mostrarPrecio
       );
 
-
     $('cProducto')
       .addEventListener(
         'change',
         mostrarPrecioCompra
       );
 
-
     document
       .querySelector('#nav button')
       ?.classList.add('active');
-
 
     renderAll();
 
