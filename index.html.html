@@ -2,15 +2,25 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover">
+
 <meta name="theme-color" content="#111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ByC Descartables">
+
+<!-- CAMBIAR ESTE NÚMERO CADA VEZ QUE PUBLIQUEMOS UNA VERSIÓN -->
+<meta name="byc-version" content="5.4">
+
 <title>ByC Descartables</title>
 
 <style>
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+
+html{
+  scroll-behavior:smooth
+}
 
 body{
   margin:0;
@@ -24,7 +34,9 @@ button,input,select,textarea{
   touch-action:manipulation
 }
 
-button{cursor:pointer}
+button{
+  cursor:pointer
+}
 
 header{
   background:#111;
@@ -75,8 +87,13 @@ main{
   padding:14px
 }
 
-.page{display:none}
-.page.active{display:block}
+.page{
+  display:none
+}
+
+.page.active{
+  display:block
+}
 
 .card{
   background:#fff;
@@ -175,10 +192,22 @@ th,td{
   vertical-align:middle
 }
 
-.right{text-align:right}
-.muted{color:#777;font-size:13px}
-.ok{color:#087f23}
-.dangerText{color:#b00020}
+.right{
+  text-align:right
+}
+
+.muted{
+  color:#777;
+  font-size:13px
+}
+
+.ok{
+  color:#087f23
+}
+
+.dangerText{
+  color:#b00020
+}
 
 .row{
   display:flex;
@@ -253,32 +282,30 @@ th,td{
   font-weight:bold
 }
 
-.clientBox{
+.clientChoice{
   background:#f7f7f7;
   border-radius:10px;
   padding:10px;
-  margin-top:8px
+  margin-top:8px;
+  border:1px solid #ddd
 }
 
-.purchaseCart{
-  background:#f7f7f7;
+.clientChoice button{
+  margin-top:6px;
+  width:100%
+}
+
+.productLine{
+  background:#f8f8f8;
   border-radius:10px;
   padding:10px;
-  margin-top:10px
-}
-
-.purchaseItem{
-  border-bottom:1px solid #ddd;
-  padding:10px 0
-}
-
-.purchaseItem:last-child{
-  border-bottom:0
+  margin:7px 0
 }
 
 .smallButton{
-  padding:7px 9px!important;
-  font-size:12px
+  padding:7px 10px!important;
+  width:auto!important;
+  margin:0!important
 }
 
 @media(max-width:600px){
@@ -339,19 +366,42 @@ th,td{
 
 <header>
   <h1>ByC Descartables</h1>
-  <small>Sistema de gestión · versión 6.0</small>
+  <small>Sistema de gestión · versión 5.4</small>
 </header>
 
 <nav id="nav">
-  <button data-page="inicio">🏠<br>Inicio</button>
-  <button data-page="productos">📦<br>Productos</button>
-  <button data-page="ventas">🛒<br>Ventas</button>
-  <button data-page="compras">🛍️<br>Compras</button>
-  <button data-page="reportes">📊<br>Rentabilidad</button>
-  <button data-page="datos">💾<br>Datos</button>
+
+  <button data-page="inicio">
+    🏠<br>Inicio
+  </button>
+
+  <button data-page="productos">
+    📦<br>Productos
+  </button>
+
+  <button data-page="ventas">
+    🛒<br>Ventas
+  </button>
+
+  <button data-page="compras">
+    🛍️<br>Compras
+  </button>
+
+  <button data-page="reportes">
+    📊<br>Rentabilidad
+  </button>
+
+  <button data-page="datos">
+    💾<br>Datos
+  </button>
+
 </nav>
 
 <main>
+
+<!-- =====================================================
+     INICIO
+===================================================== -->
 
 <section id="inicio" class="page active">
 
@@ -380,19 +430,29 @@ th,td{
   </div>
 
   <div class="card">
+
     <h3>Stock bajo</h3>
+
     <div id="stockBajo" class="muted">
       No hay productos cargados.
     </div>
+
   </div>
 
   <div class="card">
+
     <h3>📒 Cuentas corrientes pendientes</h3>
+
     <div id="inicioCuentas"></div>
+
   </div>
 
 </section>
 
+
+<!-- =====================================================
+     PRODUCTOS
+===================================================== -->
 
 <section id="productos" class="page">
 
@@ -401,44 +461,65 @@ th,td{
     <h2>📦 Nuevo producto</h2>
 
     <label>Nombre del producto</label>
-    <input id="pNombre" placeholder="Ej. Bolsas de papel N°7">
+
+    <input
+      id="pNombre"
+      placeholder="Ej. Bolsas de papel N°7"
+    >
 
     <label>Precio de compra por paquete</label>
-    <input id="pCompra"
-           type="text"
-           inputmode="decimal"
-           class="decimalInput"
-           placeholder="Ej. 1250,50">
+
+    <input
+      id="pCompra"
+      type="text"
+      inputmode="decimal"
+      class="decimalInput"
+      placeholder="Ej. 1250,50"
+    >
 
     <label>Precio de venta por paquete</label>
-    <input id="pVenta"
-           type="text"
-           inputmode="decimal"
-           class="decimalInput"
-           placeholder="Ej. 1850,50">
+
+    <input
+      id="pVenta"
+      type="text"
+      inputmode="decimal"
+      class="decimalInput"
+      placeholder="Ej. 1850,50"
+    >
 
     <label>Unidades por paquete</label>
-    <input id="pUnidadesPaquete"
-           type="number"
-           min="1"
-           step="1"
-           value="1">
+
+    <input
+      id="pUnidadesPaquete"
+      type="number"
+      min="1"
+      step="1"
+      value="1"
+    >
 
     <div class="muted">
       Ejemplo: si el paquete trae 100 bolsas, colocá 100.
     </div>
 
     <label>Stock inicial en paquetes</label>
-    <input id="pStock"
-           type="text"
-           inputmode="decimal"
-           placeholder="Ej. 10,5">
 
-    <button class="primary" onclick="agregarProducto()">
+    <input
+      id="pStock"
+      type="text"
+      inputmode="decimal"
+      placeholder="Ej. 10,5"
+    >
+
+    <button
+      class="primary"
+      onclick="agregarProducto()">
+
       ➕ Agregar producto
+
     </button>
 
   </div>
+
 
   <div class="card">
 
@@ -451,47 +532,61 @@ th,td{
 </section>
 
 
+<!-- =====================================================
+     VENTAS
+===================================================== -->
+
 <section id="ventas" class="page">
 
   <div class="card">
 
     <h2>🛒 Nueva venta</h2>
 
+    <label>Cliente</label>
+
+    <input
+      id="vCliente"
+      placeholder="Consumidor final"
+      autocomplete="off"
+    >
+
+    <div id="clientesSugeridos"></div>
+
+
     <label>Forma de pago</label>
 
     <select id="vPago">
-      <option value="pagado">💵 Pagado</option>
-      <option value="cuenta">📒 Cuenta corriente</option>
+
+      <option value="pagado">
+        💵 Pagado
+      </option>
+
+      <option value="cuenta">
+        📒 Cuenta corriente
+      </option>
+
     </select>
 
-    <label>Cliente</label>
-
-    <select id="vClienteSelect">
-      <option value="">➕ Nuevo cliente / escribir abajo</option>
-    </select>
-
-    <label>Nombre del cliente</label>
-
-    <input id="vCliente"
-           placeholder="Consumidor final">
-
-    <div class="clientBox">
-      <div class="muted">
-        Si elegís un cliente existente, la venta se asignará
-        directamente a esa cuenta.
-      </div>
-    </div>
 
     <label>Producto</label>
 
     <select id="vProducto"></select>
 
+
     <label>Vender por</label>
 
     <select id="vTipoCantidad">
-      <option value="unidad">Unidades</option>
-      <option value="paquete">Paquetes</option>
+
+      <option value="unidad">
+        Unidades
+      </option>
+
+      <option value="paquete">
+        Paquetes
+      </option>
+
     </select>
+
 
     <label>Cantidad</label>
 
@@ -502,12 +597,21 @@ th,td{
       autocomplete="off"
       value="1"
       class="decimalInput"
-      placeholder="Ej. 0,3">
+      placeholder="Ej. 0,3"
+    >
 
     <div class="muted">
+
       Podés escribir decimales con coma o punto.
-      Ejemplo: <b>0,3</b> · <b>0,5</b> · <b>1,25</b> · <b>2,75</b>
+
+      Ejemplo:
+      <b>0,3</b> ·
+      <b>0,5</b> ·
+      <b>1,25</b> ·
+      <b>2,75</b>
+
     </div>
+
 
     <label>Precio de venta por paquete</label>
 
@@ -517,12 +621,19 @@ th,td{
       inputmode="decimal"
       autocomplete="off"
       class="decimalInput"
-      placeholder="Ej. 1850,50">
+      placeholder="Ej. 1850,50"
+    >
+
 
     <div id="vInfo" class="infoBox"></div>
 
-    <button class="primary" onclick="agregarAlCarrito()">
+
+    <button
+      class="primary"
+      onclick="agregarAlCarrito()">
+
       ➕ Agregar a la venta
+
     </button>
 
   </div>
@@ -534,14 +645,21 @@ th,td{
 
     <div id="carrito"></div>
 
-    <button class="primary" onclick="finalizarVenta()">
+    <button
+      class="primary"
+      onclick="finalizarVenta()">
+
       ✅ Finalizar venta
+
     </button>
 
   </div>
 
 
-  <div class="card" id="comprobanteCard" style="display:none">
+  <div
+    class="card"
+    id="comprobanteCard"
+    style="display:none">
 
     <h3>Comprobante</h3>
 
@@ -552,13 +670,17 @@ th,td{
       <button
         class="secondary"
         onclick="window.print()">
+
         🖨️ Imprimir / PDF
+
       </button>
 
       <button
         class="secondary"
         onclick="compartir()">
+
         📲 Compartir
+
       </button>
 
     </div>
@@ -577,6 +699,10 @@ th,td{
 </section>
 
 
+<!-- =====================================================
+     COMPRAS
+===================================================== -->
+
 <section id="compras" class="page">
 
   <div class="card">
@@ -587,11 +713,14 @@ th,td{
 
     <input
       id="cProveedor"
-      placeholder="Ej. Distribuidora San Rafael">
+      placeholder="Ej. Distribuidora San Rafael"
+    >
+
 
     <label>Producto</label>
 
     <select id="cProducto"></select>
+
 
     <label>Cantidad comprada en paquetes</label>
 
@@ -599,9 +728,10 @@ th,td{
       id="cCantidad"
       type="text"
       inputmode="decimal"
-      autocomplete="off"
       class="decimalInput"
-      value="1">
+      value="1"
+    >
+
 
     <label>Precio de compra por paquete</label>
 
@@ -609,14 +739,20 @@ th,td{
       id="cPrecio"
       type="text"
       inputmode="decimal"
-      autocomplete="off"
       class="decimalInput"
-      placeholder="Ej. 1250,50">
+      placeholder="Ej. 1250,50"
+    >
+
 
     <div id="cInfo" class="infoBox"></div>
 
-    <button class="primary" onclick="agregarCompraAlCarrito()">
+
+    <button
+      class="primary"
+      onclick="agregarCompraCarrito()">
+
       ➕ Agregar producto a la compra
+
     </button>
 
   </div>
@@ -624,16 +760,16 @@ th,td{
 
   <div class="card">
 
-    <h3>🛍️ Compra actual</h3>
+    <h3>Compra actual</h3>
 
-    <div id="carritoCompras" class="purchaseCart">
-      <span class="muted">
-        No hay productos agregados a la compra.
-      </span>
-    </div>
+    <div id="carritoCompras"></div>
 
-    <button class="primary" onclick="finalizarCompra()">
+    <button
+      class="primary"
+      onclick="finalizarCompra()">
+
       ✅ Registrar compra completa
+
     </button>
 
   </div>
@@ -649,6 +785,10 @@ th,td{
 
 </section>
 
+
+<!-- =====================================================
+     REPORTES
+===================================================== -->
 
 <section id="reportes" class="page">
 
@@ -672,6 +812,10 @@ th,td{
 </section>
 
 
+<!-- =====================================================
+     DATOS
+===================================================== -->
+
 <section id="datos" class="page">
 
   <div class="card">
@@ -679,36 +823,49 @@ th,td{
     <h2>💾 Datos y copia de seguridad</h2>
 
     <p class="muted">
-      Podés exportar todos los datos para llevarlos de la PC
-      al iPhone o hacer una copia de seguridad.
+
+      Podés exportar todos los datos para llevarlos
+      de la PC al iPhone o hacer una copia de seguridad.
+
     </p>
+
 
     <div class="actions">
 
       <button
         class="primary"
         onclick="exportarDatos()">
+
         ⬇️ Exportar datos
+
       </button>
+
 
       <button
         class="secondary"
         onclick="$('archivoDatos').click()">
+
         ⬆️ Importar datos
+
       </button>
 
     </div>
+
 
     <input
       id="archivoDatos"
       type="file"
       accept="application/json,.json"
       style="display:none"
-      onchange="importarDatos(event)">
+      onchange="importarDatos(event)"
+    >
+
 
     <p class="muted">
+
       ⚠️ Importar reemplaza los datos actuales.
       Hacé una copia antes.
+
     </p>
 
   </div>
@@ -721,61 +878,111 @@ th,td{
 <script>
 
 /* =====================================================
-   BASE DE DATOS
+   CONFIGURACIÓN
 ===================================================== */
+
+const VERSION_APP='5.4';
 
 const KEY='byc_demo_v3';
 const OLD_KEY='byc_demo_v2';
 
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
 let carrito=[];
 let carritoCompras=[];
+
 let db=null;
 
+
+/* =====================================================
+   CARGAR BASE
+===================================================== */
+
 try{
-  db=JSON.parse(localStorage.getItem(KEY)||'null');
+
+  db=JSON.parse(
+    localStorage.getItem(KEY)||'null'
+  );
+
 }catch(e){
+
   db=null;
+
 }
+
 
 if(!db || typeof db!=='object'){
 
   let old=null;
 
   try{
-    old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');
+
+    old=JSON.parse(
+      localStorage.getItem(OLD_KEY)||'null'
+    );
+
   }catch(e){}
 
+
   db=old || {
+
     productos:[],
     ventas:[],
     compras:[],
     pagos:[],
     clientes:[],
     numeroVenta:0
+
   };
+
 
   localStorage.setItem(
     KEY,
     JSON.stringify(db)
   );
+
 }
 
-db.productos=Array.isArray(db.productos)
-  ?db.productos:[];
 
-db.ventas=Array.isArray(db.ventas)
-  ?db.ventas:[];
+/* =====================================================
+   NORMALIZAR BASE
+===================================================== */
 
-db.compras=Array.isArray(db.compras)
-  ?db.compras:[];
+db.productos=
+  Array.isArray(db.productos)
+  ?db.productos
+  :[];
 
-db.pagos=Array.isArray(db.pagos)
-  ?db.pagos:[];
 
-db.clientes=Array.isArray(db.clientes)
-  ?db.clientes:[];
+db.ventas=
+  Array.isArray(db.ventas)
+  ?db.ventas
+  :[];
 
-db.numeroVenta=Number(db.numeroVenta)||0;
+
+db.compras=
+  Array.isArray(db.compras)
+  ?db.compras
+  :[];
+
+
+db.pagos=
+  Array.isArray(db.pagos)
+  ?db.pagos
+  :[];
+
+
+db.clientes=
+  Array.isArray(db.clientes)
+  ?db.clientes
+  :[];
+
+
+db.numeroVenta=
+  Number(db.numeroVenta)||0;
 
 
 /* =====================================================
@@ -785,66 +992,96 @@ db.numeroVenta=Number(db.numeroVenta)||0;
 db.productos.forEach(p=>{
 
   if(
-    !Number.isFinite(Number(p.unidadesPaquete)) ||
+    !Number.isFinite(
+      Number(p.unidadesPaquete)
+    ) ||
     Number(p.unidadesPaquete)<1
   ){
+
     p.unidadesPaquete=1;
+
   }
 
-  p.stock=Number(p.stock)||0;
+
+  p.stock=
+    Number(p.stock)||0;
 
 });
+
+
+/* =====================================================
+   SELECTOR
+===================================================== */
+
+const $=id=>
+  document.getElementById(id);
 
 
 /* =====================================================
    UTILIDADES
 ===================================================== */
 
-const $=id=>document.getElementById(id);
-
-
 function money(n){
 
   return new Intl.NumberFormat(
+
     'es-AR',
+
     {
       style:'currency',
       currency:'ARS',
       maximumFractionDigits:2
     }
-  ).format(Number(n)||0);
+
+  ).format(
+    Number(n)||0
+  );
 
 }
 
 
 function numeroDecimal(valor){
 
-  if(valor===null || valor===undefined){
+  if(
+    valor===null ||
+    valor===undefined
+  ){
+
     return NaN;
+
   }
 
-  let texto=String(valor)
-    .trim()
-    .replace(/\s/g,'');
+
+  let texto=
+    String(valor)
+      .trim()
+      .replace(/\s/g,'');
+
 
   if(!texto){
+
     return NaN;
+
   }
+
 
   if(
     texto.includes('.') &&
     texto.includes(',')
   ){
 
-    texto=texto
-      .replace(/\./g,'')
-      .replace(',','.');
+    texto=
+      texto
+        .replace(/\./g,'')
+        .replace(',','.');
 
   }else{
 
-    texto=texto.replace(',','.');
+    texto=
+      texto.replace(',','.');
 
   }
+
 
   return Number(texto);
 
@@ -853,15 +1090,27 @@ function numeroDecimal(valor){
 
 function cantidad(n){
 
-  const num=Number(n)||0;
+  const num=
+    Number(n)||0;
 
-  if(Math.abs(num)<0.0000001)return '0';
+
+  if(
+    Math.abs(num)<0.0000001
+  ){
+
+    return '0';
+
+  }
+
 
   return Number.isInteger(num)
+
     ?String(num)
+
     :num.toFixed(4)
       .replace(/0+$/,'')
       .replace(/\.$/,'');
+
 }
 
 
@@ -886,7 +1135,9 @@ function save(){
 }
 
 
-function localDateISO(d=new Date()){
+function localDateISO(
+  d=new Date()
+){
 
   const y=d.getFullYear();
 
@@ -903,8 +1154,12 @@ function localDateISO(d=new Date()){
 }
 
 
-const today=()=>localDateISO();
-const month=()=>today().slice(0,7);
+const today=()=>
+  localDateISO();
+
+
+const month=()=>
+  today().slice(0,7);
 
 
 /* =====================================================
@@ -912,41 +1167,47 @@ const month=()=>today().slice(0,7);
 ===================================================== */
 
 document
-.querySelectorAll('#nav button')
-.forEach(btn=>{
+  .querySelectorAll('#nav button')
+  .forEach(btn=>{
 
-  btn.addEventListener(
-    'click',
-    ()=>{
-      show(btn.dataset.page);
-    }
-  );
+    btn.addEventListener(
+      'click',
+      ()=>show(btn.dataset.page)
+    );
 
-});
+  });
 
 
 function show(id){
 
   document
-  .querySelectorAll('.page')
-  .forEach(p=>{
-    p.classList.remove('active');
-  });
+    .querySelectorAll('.page')
+    .forEach(p=>{
+      p.classList.remove('active');
+    });
+
 
   const page=$(id);
 
+
   if(page){
+
     page.classList.add('active');
+
   }
 
+
   document
-  .querySelectorAll('#nav button')
-  .forEach(btn=>{
-    btn.classList.toggle(
-      'active',
-      btn.dataset.page===id
-    );
-  });
+    .querySelectorAll('#nav button')
+    .forEach(btn=>{
+
+      btn.classList.toggle(
+        'active',
+        btn.dataset.page===id
+      );
+
+    });
+
 
   renderAll();
 
@@ -959,35 +1220,52 @@ function show(id){
 
 function agregarProducto(){
 
-  const nombre=$('pNombre').value.trim();
+  const nombre=
+    $('pNombre')
+      .value
+      .trim();
 
-  const compra=numeroDecimal(
-    $('pCompra').value
-  );
 
-  const venta=numeroDecimal(
-    $('pVenta').value
-  );
+  const compra=
+    numeroDecimal(
+      $('pCompra').value
+    );
 
-  const unidadesPaquete=numeroDecimal(
-    $('pUnidadesPaquete').value
-  );
 
-  const stock=numeroDecimal(
-    $('pStock').value
-  );
+  const venta=
+    numeroDecimal(
+      $('pVenta').value
+    );
+
+
+  const unidadesPaquete=
+    numeroDecimal(
+      $('pUnidadesPaquete').value
+    );
+
+
+  const stock=
+    numeroDecimal(
+      $('pStock').value
+    );
 
 
   if(
+
     !nombre ||
+
     !Number.isFinite(compra) ||
     compra<0 ||
+
     !Number.isFinite(venta) ||
     venta<0 ||
+
     !Number.isFinite(unidadesPaquete) ||
     unidadesPaquete<1 ||
+
     !Number.isFinite(stock) ||
     stock<0
+
   ){
 
     alert(
@@ -995,23 +1273,36 @@ function agregarProducto(){
     );
 
     return;
+
   }
 
 
   db.productos.push({
 
-    id:Date.now()+Math.random(),
+    id:
+      Date.now()+Math.random(),
 
-    nombre:nombre,
+    nombre:
 
-    compra:compra,
+      nombre,
 
-    venta:venta,
+    compra:
+
+      compra,
+
+    venta:
+
+      venta,
 
     unidadesPaquete:
-      Math.round(unidadesPaquete),
 
-    stock:stock
+      Math.round(
+        unidadesPaquete
+      ),
+
+    stock:
+
+      stock
 
   });
 
@@ -1025,6 +1316,7 @@ function agregarProducto(){
 
   save();
 
+
   alert(
     'Producto agregado correctamente.'
   );
@@ -1034,7 +1326,9 @@ function agregarProducto(){
 
 function renderProductos(){
 
-  const el=$('listaProductos');
+  const el=
+    $('listaProductos');
+
 
   if(!db.productos.length){
 
@@ -1042,6 +1336,7 @@ function renderProductos(){
       '<span class="muted">No hay productos cargados.</span>';
 
     return;
+
   }
 
 
@@ -1050,64 +1345,81 @@ function renderProductos(){
     <table>
 
       <tr>
+
         <th>Producto</th>
         <th>Compra</th>
         <th>Venta</th>
         <th>Contenido</th>
         <th>Stock</th>
         <th>Acciones</th>
+
       </tr>
 
       ${
         db.productos.map(p=>{
 
           const up=
-            Number(p.unidadesPaquete)||1;
+            Number(
+              p.unidadesPaquete
+            )||1;
+
 
           return `
 
-          <tr>
+            <tr>
 
-            <td>${esc(p.nombre)}</td>
+              <td>
+                ${esc(p.nombre)}
+              </td>
 
-            <td>${money(p.compra)}</td>
+              <td>
+                ${money(p.compra)}
+              </td>
 
-            <td>${money(p.venta)}</td>
+              <td>
+                ${money(p.venta)}
+              </td>
 
-            <td>
-              ${cantidad(up)} u.
-            </td>
+              <td>
+                ${cantidad(up)} u.
+              </td>
 
-            <td class="${
-              p.stock<=5
-              ?'dangerText'
-              :''
-            }">
+              <td class="${
+                p.stock<=5
+                ?'dangerText'
+                :''
+              }">
 
-              ${cantidad(p.stock)}
-              <small class="muted">
-                paq.
-              </small>
+                ${cantidad(p.stock)}
 
-            </td>
+                <small class="muted">
+                  paq.
+                </small>
 
-            <td>
+              </td>
 
-              <button
-                class="secondary"
-                onclick="editarProducto('${p.id}')">
-                ✏️
-              </button>
+              <td>
 
-              <button
-                class="delete"
-                onclick="eliminarProducto('${p.id}')">
-                🗑️
-              </button>
+                <button
+                  class="secondary"
+                  onclick="editarProducto('${p.id}')">
 
-            </td>
+                  ✏️
 
-          </tr>
+                </button>
+
+
+                <button
+                  class="delete"
+                  onclick="eliminarProducto('${p.id}')">
+
+                  🗑️
+
+                </button>
+
+              </td>
+
+            </tr>
 
           `;
 
@@ -1115,6 +1427,7 @@ function renderProductos(){
       }
 
     </table>
+
   `;
 
 }
@@ -1122,90 +1435,130 @@ function renderProductos(){
 
 function editarProducto(id){
 
-  const p=db.productos.find(
-    x=>String(x.id)===String(id)
-  );
+  const p=
+    db.productos.find(
+      x=>String(x.id)===String(id)
+    );
+
 
   if(!p)return;
 
 
-  const nombre=prompt(
-    'Nombre del producto:',
-    p.nombre
-  );
+  const nombre=
+    prompt(
+      'Nombre del producto:',
+      p.nombre
+    );
+
 
   if(nombre===null)return;
 
 
-  const venta=prompt(
-    'Precio de venta por paquete:',
-    p.venta
-  );
+  const venta=
+    prompt(
+      'Precio de venta por paquete:',
+      p.venta
+    );
+
 
   if(venta===null)return;
 
 
-  const compra=prompt(
-    'Precio de compra por paquete:',
-    p.compra
-  );
+  const compra=
+    prompt(
+      'Precio de compra por paquete:',
+      p.compra
+    );
+
 
   if(compra===null)return;
 
 
-  const unidades=prompt(
-    '¿Cuántas unidades trae cada paquete?',
-    Number(p.unidadesPaquete)||1
-  );
+  const unidades=
+    prompt(
+      '¿Cuántas unidades trae cada paquete?',
+      Number(p.unidadesPaquete)||1
+    );
+
 
   if(unidades===null)return;
 
 
-  const stock=prompt(
-    'Stock en paquetes:',
-    p.stock
-  );
+  const stock=
+    prompt(
+      'Stock en paquetes:',
+      p.stock
+    );
+
 
   if(stock===null)return;
 
 
-  const pv=numeroDecimal(venta);
-  const pc=numeroDecimal(compra);
-  const up=numeroDecimal(unidades);
-  const st=numeroDecimal(stock);
+  const pv=
+    numeroDecimal(venta);
+
+
+  const pc=
+    numeroDecimal(compra);
+
+
+  const up=
+    numeroDecimal(unidades);
+
+
+  const st=
+    numeroDecimal(stock);
 
 
   if(
+
     !nombre.trim() ||
+
     !Number.isFinite(pv) ||
     pv<0 ||
+
     !Number.isFinite(pc) ||
     pc<0 ||
+
     !Number.isFinite(up) ||
     up<1 ||
+
     !Number.isFinite(st) ||
     st<0
+
   ){
 
-    alert('Datos inválidos.');
+    alert(
+      'Datos inválidos.'
+    );
 
     return;
+
   }
 
 
-  p.nombre=nombre.trim();
+  p.nombre=
+    nombre.trim();
 
-  p.venta=pv;
 
-  p.compra=pc;
+  p.venta=
+    pv;
+
+
+  p.compra=
+    pc;
+
 
   p.unidadesPaquete=
     Math.round(up);
 
-  p.stock=st;
+
+  p.stock=
+    st;
 
 
   save();
+
 
   alert(
     'Producto actualizado.'
@@ -1216,24 +1569,25 @@ function editarProducto(id){
 
 function eliminarProducto(id){
 
-  const p=db.productos.find(
-    x=>String(x.id)===String(id)
-  );
+  const p=
+    db.productos.find(
+      x=>String(x.id)===String(id)
+    );
+
 
   if(!p)return;
 
 
   const tieneMovimientos=
+
     db.ventas.some(v=>
       v.items?.some(i=>
         String(i.id)===String(id)
       )
-    ) ||
-    db.compras.some(c=>
-      c.items?.some(i=>
-        String(i.productoId)===String(id)
-      )
-    ) ||
+    )
+
+    ||
+
     db.compras.some(c=>
       String(c.productoId)===String(id)
     );
@@ -1247,30 +1601,34 @@ function eliminarProducto(id){
 
     mensaje+=
       '⚠️ Este producto tiene ventas o compras registradas.\n'+
-      'Se eliminará del listado, pero se conservará el historial.\n\n';
+      'Se eliminará del listado pero se conservará el historial.\n\n';
 
   }
 
 
-  mensaje+='¿Continuar?';
+  mensaje+=
+    '¿Continuar?';
 
 
   if(!confirm(mensaje))return;
 
 
-  db.productos=db.productos.filter(
-    x=>String(x.id)!==String(id)
-  );
+  db.productos=
+    db.productos.filter(
+      x=>String(x.id)!==String(id)
+    );
 
 
-  carrito=carrito.filter(
-    x=>String(x.id)!==String(id)
-  );
+  carrito=
+    carrito.filter(
+      x=>String(x.id)!==String(id)
+    );
 
 
-  carritoCompras=carritoCompras.filter(
-    x=>String(x.productoId)!==String(id)
-  );
+  carritoCompras=
+    carritoCompras.filter(
+      x=>String(x.id)!==String(id)
+    );
 
 
   save();
@@ -1289,19 +1647,26 @@ function eliminarProducto(id){
 
 function renderSelects(){
 
-  const opts=db.productos.map(p=>{
+  const valorVenta=
+    $('vProducto').value;
 
-    return `
+
+  const valorCompra=
+    $('cProducto').value;
+
+
+  const opts=
+    db.productos.map(p=>`
 
       <option value="${p.id}">
+
         ${esc(p.nombre)}
         — ${money(p.venta)}
         — stock ${cantidad(p.stock)} paq.
+
       </option>
 
-    `;
-
-  }).join('');
+    `).join('');
 
 
   $('vProducto').innerHTML=
@@ -1314,80 +1679,67 @@ function renderSelects(){
     '<option value="">No hay productos</option>';
 
 
+  if(
+    valorVenta &&
+    db.productos.some(
+      p=>String(p.id)===String(valorVenta)
+    )
+  ){
+
+    $('vProducto').value=
+      valorVenta;
+
+  }
+
+
+  if(
+    valorCompra &&
+    db.productos.some(
+      p=>String(p.id)===String(valorCompra)
+    )
+  ){
+
+    $('cProducto').value=
+      valorCompra;
+
+  }
+
+
   mostrarPrecio();
   mostrarPrecioCompra();
 
 }
 
 
-function renderClientesSelect(){
-
-  const select=$('vClienteSelect');
-
-  const actual=select.value;
-
-  select.innerHTML=`
-
-    <option value="">
-      ➕ Nuevo cliente / escribir abajo
-    </option>
-
-    ${
-      db.clientes
-      .slice()
-      .sort((a,b)=>
-        String(a.nombre).localeCompare(
-          String(b.nombre),
-          'es'
-        )
-      )
-      .map(c=>`
-
-        <option value="${c.id}">
-          👤 ${esc(c.nombre)}
-          · Saldo ${money(saldoCliente(c.id))}
-        </option>
-
-      `).join('')
-    }
-
-  `;
-
-  if(
-    actual &&
-    db.clientes.some(
-      c=>String(c.id)===String(actual)
-    )
-  ){
-
-    select.value=actual;
-
-  }
-
-}
-
-
 function actualizarTipoCantidad(){
 
-  const p=db.productos.find(
-    x=>String(x.id)===$('vProducto').value
-  );
+  const p=
+    db.productos.find(
+      x=>String(x.id)===$('vProducto').value
+    );
 
-  const select=$('vTipoCantidad');
+
+  const select=
+    $('vTipoCantidad');
+
 
   if(!p){
 
     select.innerHTML=
       '<option value="unidad">Unidades</option>';
 
-    select.value='unidad';
+    select.value=
+      'unidad';
 
     return;
+
   }
 
 
   const up=
-    Number(p.unidadesPaquete)||1;
+    Number(
+      p.unidadesPaquete
+    )||1;
 
 
   if(up<=1){
@@ -1395,7 +1747,8 @@ function actualizarTipoCantidad(){
     select.innerHTML=
       '<option value="unidad">Unidades</option>';
 
-    select.value='unidad';
+    select.value=
+      'unidad';
 
   }else{
 
@@ -1418,9 +1771,10 @@ function actualizarTipoCantidad(){
 
 function mostrarPrecio(){
 
-  const p=db.productos.find(
-    x=>String(x.id)===$('vProducto').value
-  );
+  const p=
+    db.productos.find(
+      x=>String(x.id)===$('vProducto').value
+    );
 
 
   actualizarTipoCantidad();
@@ -1432,11 +1786,13 @@ function mostrarPrecio(){
     $('vInfo').textContent='';
 
     return;
+
   }
 
 
   $('vPrecio').value=
-    String(p.venta).replace('.',',');
+    String(p.venta)
+      .replace('.',',');
 
 
   actualizarInfoVenta();
@@ -1446,9 +1802,11 @@ function mostrarPrecio(){
 
 function actualizarInfoVenta(){
 
-  const p=db.productos.find(
-    x=>String(x.id)===$('vProducto').value
-  );
+  const p=
+    db.productos.find(
+      x=>String(x.id)===$('vProducto').value
+    );
+
 
   if(!p)return;
 
@@ -1466,39 +1824,58 @@ function actualizarInfoVenta(){
 
 
   if(
-    !Number.isFinite(cantidadIngresada) ||
+
+    !Number.isFinite(
+      cantidadIngresada
+    )
+
+    ||
+
     cantidadIngresada<=0
+
   ){
 
     $('vInfo').innerHTML=
       `📦 Stock disponible: <b>${cantidad(p.stock)}</b> paquetes.`;
 
     return;
+
   }
 
 
   if(
+
     !Number.isFinite(precio) ||
     precio<0
+
   ){
 
     return;
+
   }
 
 
   const up=
-    Number(p.unidadesPaquete)||1;
+    Number(
+      p.unidadesPaquete
+    )||1;
 
 
   let paquetes;
 
 
   if(
-    $('vTipoCantidad').value==='paquete' ||
+
+    $('vTipoCantidad').value==='paquete'
+
+    ||
+
     up<=1
+
   ){
 
-    paquetes=cantidadIngresada;
+    paquetes=
+      cantidadIngresada;
 
   }else{
 
@@ -1508,7 +1885,8 @@ function actualizarInfoVenta(){
   }
 
 
-  paquetes=redondear(paquetes);
+  paquetes=
+    redondear(paquetes);
 
 
   const stock=
@@ -1520,14 +1898,17 @@ function actualizarInfoVenta(){
 
 
   $('vInfo').innerHTML=
+
     `📦 Stock: <b>${cantidad(stock)} paquetes</b> `+
     `(${cantidad(stock*up)} unidades).<br>`+
 
-    `🛒 Venta: <b>${cantidad(cantidadIngresada)} ${
+    `🛒 Venta: <b>${cantidad(cantidadIngresada)} `+
+    `${
       $('vTipoCantidad').value==='paquete'
       ?'paquetes'
       :'unidades'
-    }</b> = <b>${cantidad(paquetes)} paquetes</b>.<br>`+
+    }</b> = `+
+    `<b>${cantidad(paquetes)} paquetes</b>.<br>`+
 
     `💰 Precio por paquete: <b>${money(precio)}</b><br>`+
 
@@ -1538,23 +1919,30 @@ function actualizarInfoVenta(){
 
 function mostrarPrecioCompra(){
 
-  const p=db.productos.find(
-    x=>String(x.id)===$('cProducto').value
-  );
+  const p=
+    db.productos.find(
+      x=>String(x.id)===$('cProducto').value
+    );
 
 
   if(p){
 
     $('cPrecio').value=
-      String(p.compra).replace('.',',');
+      String(p.compra)
+        .replace('.',',');
 
 
     const up=
-      Number(p.unidadesPaquete)||1;
+      Number(
+        p.unidadesPaquete
+      )||1;
+
 
     $('cInfo').innerHTML=
+
       `📦 Cada paquete contiene <b>${cantidad(up)} unidades</b>.<br>`+
-      `La compra se registra en <b>paquetes</b>.`;
+
+      `La compra se registra en paquetes.`;
 
   }else{
 
@@ -1572,8 +1960,11 @@ function mostrarPrecioCompra(){
 function normalizarCliente(nombre){
 
   return String(nombre||'')
+
     .trim()
+
     .replace(/\s+/g,' ')
+
     .toLowerCase();
 
 }
@@ -1581,28 +1972,40 @@ function normalizarCliente(nombre){
 
 function registrarCliente(nombre){
 
-  nombre=String(nombre||'').trim();
+  nombre=
+    String(nombre||'')
+      .trim();
+
 
   if(!nombre)return null;
 
 
-  const existente=db.clientes.find(
-    c=>
-      normalizarCliente(c.nombre)===
-      normalizarCliente(nombre)
-  );
+  const existente=
+    db.clientes.find(
+      c=>
+        normalizarCliente(c.nombre)===
+        normalizarCliente(nombre)
+    );
 
 
   if(existente)return existente;
 
 
   const cliente={
-    id:Date.now()+Math.random(),
-    nombre:nombre
+
+    id:
+      Date.now()+Math.random(),
+
+    nombre:
+      nombre
+
   };
 
 
-  db.clientes.push(cliente);
+  db.clientes.push(
+    cliente
+  );
+
 
   return cliente;
 
@@ -1619,34 +2022,112 @@ function obtenerCliente(id){
 
 
 /* =====================================================
-   CLIENTE SELECCIONADO
+   BUSCAR CLIENTES
 ===================================================== */
 
-$('vClienteSelect')?.addEventListener(
-  'change',
-  function(){
+function buscarClientes(){
 
-    const id=this.value;
-
-    if(!id){
-
-      $('vCliente').value='';
-
-      return;
-    }
+  const texto=
+    $('vCliente')
+      .value
+      .trim();
 
 
-    const cliente=obtenerCliente(id);
+  const el=
+    $('clientesSugeridos');
 
-    if(cliente){
 
-      $('vCliente').value=
-        cliente.nombre;
+  if(!texto){
 
-    }
+    el.innerHTML='';
+
+    return;
 
   }
-);
+
+
+  const normal=
+    normalizarCliente(texto);
+
+
+  const encontrados=
+    db.clientes.filter(c=>
+      normalizarCliente(c.nombre)
+        .includes(normal)
+    );
+
+
+  if(!encontrados.length){
+
+    el.innerHTML='';
+
+    return;
+
+  }
+
+
+  el.innerHTML=`
+
+    <div class="clientChoice">
+
+      <b>
+        📒 ¿Querés usar una cuenta existente?
+      </b>
+
+      ${
+        encontrados.map(c=>`
+
+          <button
+            class="secondary"
+            onclick="seleccionarCliente('${c.id}')">
+
+            👤 ${esc(c.nombre)}
+
+            · Saldo:
+            ${money(
+              saldoCliente(c.id)
+            )}
+
+          </button>
+
+        `).join('')
+      }
+
+    </div>
+
+  `;
+
+}
+
+
+function seleccionarCliente(id){
+
+  const cliente=
+    obtenerCliente(id);
+
+
+  if(!cliente)return;
+
+
+  $('vCliente').value=
+    cliente.nombre;
+
+
+  $('vCliente')
+    .dataset.clienteId=
+      cliente.id;
+
+
+  $('clientesSugeridos').innerHTML=
+
+    `<div class="infoBox">
+
+      ✅ Cliente seleccionado:
+      <b>${esc(cliente.nombre)}</b>
+
+    </div>`;
+
+}
 
 
 /* =====================================================
@@ -1655,9 +2136,10 @@ $('vClienteSelect')?.addEventListener(
 
 function agregarAlCarrito(){
 
-  const producto=db.productos.find(
-    p=>String(p.id)===$('vProducto').value
-  );
+  const producto=
+    db.productos.find(
+      p=>String(p.id)===$('vProducto').value
+    );
 
 
   const cantidadIngresada=
@@ -1673,32 +2155,48 @@ function agregarAlCarrito(){
 
 
   if(
+
     !producto ||
-    !Number.isFinite(cantidadIngresada) ||
+
+    !Number.isFinite(
+      cantidadIngresada
+    ) ||
+
     cantidadIngresada<=0 ||
+
     !Number.isFinite(precio) ||
+
     precio<0
+
   ){
 
     alert(
-      'Completá correctamente la cantidad y el precio de la venta.\n\n'+
+      'Completá correctamente la cantidad y el precio.\n\n'+
       'Ejemplos válidos: 0,3 · 0,5 · 1,25 · 2,75'
     );
 
     return;
+
   }
 
 
   const up=
-    Number(producto.unidadesPaquete)||1;
+    Number(
+      producto.unidadesPaquete
+    )||1;
 
 
   let paquetes;
 
 
   if(
-    $('vTipoCantidad').value==='paquete' ||
+
+    $('vTipoCantidad').value==='paquete'
+
+    ||
+
     up<=1
+
   ){
 
     paquetes=
@@ -1712,30 +2210,55 @@ function agregarAlCarrito(){
   }
 
 
-  paquetes=redondear(paquetes);
+  paquetes=
+    redondear(paquetes);
 
 
-  const yaPaquetes=carrito
-    .filter(x=>String(x.id)===String(producto.id))
-    .reduce(
-      (a,x)=>a+Number(x.paquetes||0),
-      0
-    );
+  const yaPaquetes=
+    carrito
+
+      .filter(
+        x=>
+          String(x.id)===
+          String(producto.id)
+      )
+
+      .reduce(
+        (a,x)=>
+          a+Number(x.paquetes||0),
+        0
+      );
 
 
   if(
+
     paquetes+yaPaquetes>
-    Number(producto.stock)+0.0000001
+
+    Number(producto.stock)+
+    0.0000001
+
   ){
 
     alert(
+
       `No hay suficiente stock.\n\n`+
-      `Disponible: ${cantidad(producto.stock)} paquetes `+
-      `(${cantidad(producto.stock*up)} unidades).\n\n`+
-      `Estás intentando agregar: ${cantidad(paquetes)} paquetes.`
+
+      `Disponible: ${
+        cantidad(producto.stock)
+      } paquetes `+
+
+      `(${
+        cantidad(producto.stock*up)
+      } unidades).\n\n`+
+
+      `Estás intentando agregar: ${
+        cantidad(paquetes)
+      } paquetes.`
+
     );
 
     return;
+
   }
 
 
@@ -1744,44 +2267,57 @@ function agregarAlCarrito(){
 
 
   const costo=
-    paquetes*(Number(producto.compra)||0);
+    paquetes*
+    (Number(producto.compra)||0);
 
 
   carrito.push({
 
-    id:producto.id,
+    id:
+      producto.id,
 
-    nombre:producto.nombre,
+    nombre:
+      producto.nombre,
 
-    cantidad:cantidadIngresada,
+    cantidad:
+      cantidadIngresada,
 
     tipoCantidad:
       $('vTipoCantidad').value,
 
-    paquetes:paquetes,
+    paquetes:
+      paquetes,
 
-    unidadesPaquete:up,
+    unidadesPaquete:
+      up,
 
-    precio:precio,
+    precio:
+      precio,
 
     costoPorPaquete:
       Number(producto.compra)||0,
 
-    costo:costo,
+    costo:
+      costo,
 
-    total:total
+    total:
+      total
 
   });
 
 
   renderCarrito();
 
+
+  $('vCantidad').value='1';
+
 }
 
 
 function renderCarrito(){
 
-  const el=$('carrito');
+  const el=
+    $('carrito');
 
 
   if(!carrito.length){
@@ -1790,13 +2326,16 @@ function renderCarrito(){
       '<span class="muted">No hay productos agregados.</span>';
 
     return;
+
   }
 
 
-  const total=carrito.reduce(
-    (a,x)=>a+Number(x.total||0),
-    0
-  );
+  const total=
+    carrito.reduce(
+      (a,x)=>
+        a+Number(x.total||0),
+      0
+    );
 
 
   el.innerHTML=`
@@ -1813,15 +2352,20 @@ function renderCarrito(){
 
       </tr>
 
-
       ${
         carrito.map((x,i)=>{
 
           let detalle;
 
+
           if(
-            x.tipoCantidad==='paquete' ||
+
+            x.tipoCantidad==='paquete'
+
+            ||
+
             Number(x.unidadesPaquete)<=1
+
           ){
 
             detalle=
@@ -1879,7 +2423,9 @@ function renderCarrito(){
 
 
     <div class="total right">
+
       TOTAL ${money(total)}
+
     </div>
 
   `;
@@ -1909,28 +2455,50 @@ function finalizarVenta(){
     );
 
     return;
+
   }
 
 
-  const total=carrito.reduce(
-    (a,x)=>a+Number(x.total||0),
-    0
-  );
+  const total=
+    carrito.reduce(
+      (a,x)=>
+        a+Number(x.total||0),
+      0
+    );
 
 
-  const costo=carrito.reduce(
-    (a,x)=>a+Number(x.costo||0),
-    0
-  );
+  const costo=
+    carrito.reduce(
+      (a,x)=>
+        a+Number(x.costo||0),
+      0
+    );
 
 
-  const formaPago=$('vPago').value;
+  const nombreCliente=
+    $('vCliente')
+      .value
+      .trim()
+      ||
+    'Consumidor final';
+
+
+  const formaPago=
+    $('vPago').value;
 
 
   let cliente=null;
 
+
+  /*
+    Si seleccionamos un cliente,
+    usamos SIEMPRE ese cliente.
+  */
+
   const clienteSeleccionado=
-    $('vClienteSelect').value;
+    $('vCliente')
+      .dataset
+      .clienteId;
 
 
   if(clienteSeleccionado){
@@ -1943,47 +2511,185 @@ function finalizarVenta(){
   }
 
 
-  const textoCliente=
-    $('vCliente').value.trim();
+  /*
+    Si no seleccionó uno,
+    buscamos coincidencia exacta.
+  */
 
+  if(
 
-  if(!cliente && textoCliente){
+    !cliente &&
+    nombreCliente!=='Consumidor final'
+
+  ){
 
     cliente=
-      registrarCliente(
-        textoCliente
+      db.clientes.find(
+        c=>
+          normalizarCliente(c.nombre)===
+          normalizarCliente(nombreCliente)
       );
 
   }
 
 
-  if(!cliente && formaPago==='cuenta'){
+  /*
+    Si es cuenta corriente y no existe,
+    preguntamos antes de crear.
+  */
 
-    alert(
-      'Para una cuenta corriente tenés que seleccionar o indicar un cliente.'
-    );
+  if(formaPago==='cuenta' && !cliente){
 
-    return;
+    const encontrados=
+      db.clientes.filter(c=>{
+
+        const a=
+          normalizarCliente(c.nombre);
+
+        const b=
+          normalizarCliente(nombreCliente);
+
+        return (
+          a.includes(b) ||
+          b.includes(a)
+        );
+
+      });
+
+
+    if(encontrados.length){
+
+      const lista=
+        encontrados
+          .map(
+            (c,i)=>
+              `${i+1}. ${c.nombre}`
+          )
+          .join('\n');
+
+
+      const respuesta=
+        prompt(
+
+          `No encontré una coincidencia exacta.\n\n`+
+
+          `¿Querés usar una cuenta existente?\n\n`+
+
+          `${lista}\n\n`+
+
+          `Escribí el número o CANCELAR para crear una nueva.`
+
+        );
+
+
+      if(respuesta===null)return;
+
+
+      const numero=
+        Number(respuesta);
+
+
+      if(
+        Number.isInteger(numero) &&
+        numero>=1 &&
+        numero<=encontrados.length
+      ){
+
+        cliente=
+          encontrados[numero-1];
+
+      }
+
+    }
+
+
+    if(!cliente){
+
+      const crear=
+        confirm(
+
+          `No existe una cuenta con el nombre "${nombreCliente}".\n\n`+
+
+          `¿Querés crear una cuenta nueva para este cliente?`
+
+        );
+
+
+      if(!crear)return;
+
+
+      cliente=
+        registrarCliente(
+          nombreCliente
+        );
+
+    }
+
   }
 
 
-  const nombreCliente=
-    cliente?.nombre ||
-    textoCliente ||
-    'Consumidor final';
+  /*
+    Para ventas pagadas también
+    guardamos el cliente si fue indicado.
+  */
+
+  if(
+
+    !cliente &&
+
+    nombreCliente!=='Consumidor final'
+
+  ){
+
+    cliente=
+      registrarCliente(
+        nombreCliente
+      );
+
+  }
 
 
-  for(const item of carrito){
+  if(
 
-    const p=db.productos.find(
-      x=>String(x.id)===String(item.id)
+    formaPago==='cuenta' &&
+    !cliente
+
+  ){
+
+    alert(
+      'Para una cuenta corriente tenés que indicar el cliente.'
     );
+
+    return;
+
+  }
+
+
+  /*
+    Verificar stock nuevamente
+  */
+
+  for(
+    const item of carrito
+  ){
+
+    const p=
+      db.productos.find(
+        x=>
+          String(x.id)===
+          String(item.id)
+      );
 
 
     if(
+
       !p ||
-      Number(p.stock)+0.0000001<
+
+      Number(p.stock)+
+      0.0000001
+      <
       Number(item.paquetes||0)
+
     ){
 
       alert(
@@ -1991,22 +2697,32 @@ function finalizarVenta(){
       );
 
       return;
+
     }
 
   }
 
 
+  /*
+    Descontar stock
+  */
+
   carrito.forEach(item=>{
 
-    const p=db.productos.find(
-      x=>String(x.id)===String(item.id)
-    );
+    const p=
+      db.productos.find(
+        x=>
+          String(x.id)===
+          String(item.id)
+      );
 
 
     p.stock=
       redondear(
+
         Number(p.stock)-
         Number(item.paquetes||0)
+
       );
 
   });
@@ -2017,31 +2733,43 @@ function finalizarVenta(){
 
   const venta={
 
-    id:Date.now()+Math.random(),
+    id:
+      Date.now()+Math.random(),
 
-    numero:db.numeroVenta,
+    numero:
+      db.numeroVenta,
 
-    fecha:new Date().toISOString(),
+    fecha:
+      new Date().toISOString(),
 
     clienteId:
-      cliente?cliente.id:null,
+      cliente
+      ?cliente.id
+      :null,
 
-    cliente:nombreCliente,
+    cliente:
+      cliente
+      ?cliente.nombre
+      :nombreCliente,
 
-    pago:formaPago,
+    pago:
+      formaPago,
 
     estado:
       formaPago==='pagado'
       ?'Pagado'
       :'Cuenta corriente',
 
-    items:JSON.parse(
-      JSON.stringify(carrito)
-    ),
+    items:
+      JSON.parse(
+        JSON.stringify(carrito)
+      ),
 
-    total:total,
+    total:
+      total,
 
-    costo:costo,
+    costo:
+      costo,
 
     ganancia:
       total-costo
@@ -2049,34 +2777,43 @@ function finalizarVenta(){
   };
 
 
-  db.ventas.unshift(venta);
-
-
-  carrito=[];
+  db.ventas.unshift(
+    venta
+  );
 
 
   save();
 
 
-  $('vCliente').value='';
+  carrito=[];
 
-  $('vClienteSelect').value='';
+
+  $('vCliente').value='';
+  $('vCliente').dataset.clienteId='';
 
   $('vPago').value='pagado';
 
   $('vCantidad').value='1';
 
+  $('clientesSugeridos').innerHTML='';
+
 
   renderCarrito();
 
 
-  mostrarComprobante(venta);
+  mostrarComprobante(
+    venta
+  );
 
 
   alert(
+
     formaPago==='cuenta'
+
     ?'Venta registrada en cuenta corriente.'
+
     :'Venta registrada como pagada.'
+
   );
 
 }
@@ -2088,27 +2825,42 @@ function finalizarVenta(){
 
 function eliminarVenta(id){
 
-  const v=db.ventas.find(
-    x=>String(x.id)===String(id)
-  );
+  const v=
+    db.ventas.find(
+      x=>String(x.id)===String(id)
+    );
 
 
   if(!v)return;
 
 
   if(!confirm(
-    `¿Eliminar la Venta #${String(v.numero).padStart(6,'0')}?\n\n`+
+
+    `¿Eliminar la Venta #${
+      String(v.numero).padStart(6,'0')
+    }?\n\n`+
+
     `Total: ${money(v.total)}\n`+
-    `Cliente: ${v.cliente || 'Consumidor final'}\n\n`+
+
+    `Cliente: ${
+      v.cliente||'Consumidor final'
+    }\n\n`+
+
     `El stock de los productos vendidos será devuelto.`
+
   ))return;
 
 
-  for(const item of (v.items||[])){
+  for(
+    const item of (v.items||[])
+  ){
 
-    const p=db.productos.find(
-      x=>String(x.id)===String(item.id)
-    );
+    const p=
+      db.productos.find(
+        x=>
+          String(x.id)===
+          String(item.id)
+      );
 
 
     if(p){
@@ -2117,7 +2869,9 @@ function eliminarVenta(id){
 
 
       if(
-        Number.isFinite(Number(item.paquetes))
+        Number.isFinite(
+          Number(item.paquetes)
+        )
       ){
 
         paquetes=
@@ -2136,8 +2890,10 @@ function eliminarVenta(id){
 
       p.stock=
         redondear(
+
           Number(p.stock||0)+
           paquetes
+
         );
 
     }
@@ -2145,16 +2901,21 @@ function eliminarVenta(id){
   }
 
 
-  db.ventas=db.ventas.filter(
-    x=>String(x.id)!==String(id)
-  );
+  db.ventas=
+    db.ventas.filter(
+      x=>
+        String(x.id)!==
+        String(id)
+    );
 
 
   save();
 
 
   alert(
-    `Venta #${String(v.numero).padStart(6,'0')} eliminada.\n\n`+
+    `Venta #${
+      String(v.numero).padStart(6,'0')
+    } eliminada.\n\n`+
     `El stock fue devuelto correctamente.`
   );
 
@@ -2169,12 +2930,14 @@ function mostrarComprobante(v){
 
   const fecha=
     new Date(v.fecha)
-    .toLocaleString('es-AR');
+      .toLocaleString('es-AR');
 
 
   const formaPago=
     v.pago==='cuenta'
+
     ?'📒 CUENTA CORRIENTE'
+
     :'💵 PAGADO';
 
 
@@ -2202,7 +2965,6 @@ function mostrarComprobante(v){
 
       <hr>
 
-
       ${
         v.items.map(x=>{
 
@@ -2210,9 +2972,13 @@ function mostrarComprobante(v){
 
 
           if(
+
             x.tipoCantidad==='paquete' ||
+
             Number(x.unidadesPaquete)<=1 ||
+
             !x.tipoCantidad
+
           ){
 
             detalle=
@@ -2231,8 +2997,11 @@ function mostrarComprobante(v){
             <div class="row">
 
               <span>
+
                 ${esc(x.nombre)}
+
                 × ${detalle}
+
               </span>
 
               <b>
@@ -2267,7 +3036,9 @@ function mostrarComprobante(v){
   `;
 
 
-  $('comprobanteCard').style.display='block';
+  $('comprobanteCard')
+    .style
+    .display='block';
 
 
   setTimeout(()=>{
@@ -2287,7 +3058,9 @@ async function compartir(){
   const texto=
     document
       .querySelector('.receipt')
-      ?.innerText || '';
+      ?.innerText
+      ||
+      '';
 
 
   if(navigator.share){
@@ -2295,8 +3068,13 @@ async function compartir(){
     try{
 
       await navigator.share({
-        title:'ByC Descartables',
-        text:texto
+
+        title:
+          'ByC Descartables',
+
+        text:
+          texto
+
       });
 
     }catch(e){}
@@ -2313,14 +3091,15 @@ async function compartir(){
 
 
 /* =====================================================
-   COMPRAS MULTIPRODUCTO
+   COMPRAS - CARRITO
 ===================================================== */
 
-function agregarCompraAlCarrito(){
+function agregarCompraCarrito(){
 
-  const producto=db.productos.find(
-    p=>String(p.id)===$('cProducto').value
-  );
+  const producto=
+    db.productos.find(
+      p=>String(p.id)===$('cProducto').value
+    );
 
 
   const cantidadCompra=
@@ -2336,11 +3115,17 @@ function agregarCompraAlCarrito(){
 
 
   if(
+
     !producto ||
+
     !Number.isFinite(cantidadCompra) ||
+
     cantidadCompra<=0 ||
+
     !Number.isFinite(precio) ||
+
     precio<0
+
   ){
 
     alert(
@@ -2348,13 +3133,14 @@ function agregarCompraAlCarrito(){
     );
 
     return;
+
   }
 
 
   const existente=
     carritoCompras.find(
       x=>
-        String(x.productoId)===
+        String(x.id)===
         String(producto.id)
     );
 
@@ -2367,24 +3153,30 @@ function agregarCompraAlCarrito(){
         cantidadCompra
       );
 
-    existente.precio=precio;
+    existente.precio=
+      precio;
 
     existente.total=
-      existente.cantidad*existente.precio;
+      existente.cantidad*precio;
 
   }else{
 
     carritoCompras.push({
 
-      productoId:producto.id,
+      id:
+        producto.id,
 
-      producto:producto.nombre,
+      nombre:
+        producto.nombre,
 
-      cantidad:cantidadCompra,
+      cantidad:
+        cantidadCompra,
 
-      precio:precio,
+      precio:
+        precio,
 
-      total:cantidadCompra*precio
+      total:
+        cantidadCompra*precio
 
     });
 
@@ -2401,7 +3193,8 @@ function agregarCompraAlCarrito(){
 
 function renderCarritoCompras(){
 
-  const el=$('carritoCompras');
+  const el=
+    $('carritoCompras');
 
 
   if(!carritoCompras.length){
@@ -2410,12 +3203,14 @@ function renderCarritoCompras(){
       '<span class="muted">No hay productos agregados a la compra.</span>';
 
     return;
+
   }
 
 
   const total=
     carritoCompras.reduce(
-      (a,x)=>a+Number(x.total||0),
+      (a,x)=>
+        a+Number(x.total||0),
       0
     );
 
@@ -2440,68 +3235,51 @@ function renderCarritoCompras(){
 
 
       ${
-        carritoCompras.map((x,i)=>{
+        carritoCompras.map((x,i)=>`
 
-          const p=
-            db.productos.find(
-              p=>
-                String(p.id)===
-                String(x.productoId)
-            );
+          <tr>
 
+            <td>
+              ${esc(x.nombre)}
+            </td>
 
-          const up=
-            Number(p?.unidadesPaquete)||1;
+            <td>
+              ${cantidad(x.cantidad)} paq.
+            </td>
 
+            <td>
+              ${money(x.precio)}
+            </td>
 
-          return `
+            <td>
+              ${money(x.total)}
+            </td>
 
-            <tr>
+            <td>
 
-              <td>
-                ${esc(x.producto)}
-              </td>
+              <button
+                class="delete"
+                onclick="quitarCompraCarrito(${i})">
 
-              <td>
-                ${cantidad(x.cantidad)} paq.
-                <br>
-                <small class="muted">
-                  ${cantidad(x.cantidad*up)} un.
-                </small>
-              </td>
+                ✕
 
-              <td>
-                ${money(x.precio)}
-              </td>
+              </button>
 
-              <td>
-                ${money(x.total)}
-              </td>
+            </td>
 
-              <td>
+          </tr>
 
-                <button
-                  class="delete"
-                  onclick="quitarCompraDelCarrito(${i})">
-
-                  ✕
-
-                </button>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }).join('')
+        `).join('')
       }
 
     </table>
 
 
     <div class="total right">
-      TOTAL COMPRA ${money(total)}
+
+      TOTAL COMPRA
+      ${money(total)}
+
     </div>
 
   `;
@@ -2509,19 +3287,28 @@ function renderCarritoCompras(){
 }
 
 
-function quitarCompraDelCarrito(i){
+function quitarCompraCarrito(i){
 
-  carritoCompras.splice(i,1);
+  carritoCompras.splice(
+    i,
+    1
+  );
 
   renderCarritoCompras();
 
 }
 
 
+/* =====================================================
+   FINALIZAR COMPRA
+===================================================== */
+
 function finalizarCompra(){
 
   const proveedor=
-    $('cProveedor').value.trim();
+    $('cProveedor')
+      .value
+      .trim();
 
 
   if(!proveedor){
@@ -2531,6 +3318,7 @@ function finalizarCompra(){
     );
 
     return;
+
   }
 
 
@@ -2541,94 +3329,88 @@ function finalizarCompra(){
     );
 
     return;
-  }
-
-
-  const total=
-    carritoCompras.reduce(
-      (a,x)=>a+Number(x.total||0),
-      0
-    );
-
-
-  /*
-    Primero verificamos que todos los productos
-    sigan existiendo.
-  */
-
-  for(const item of carritoCompras){
-
-    const p=db.productos.find(
-      p=>
-        String(p.id)===
-        String(item.productoId)
-    );
-
-
-    if(!p){
-
-      alert(
-        `No se encontró el producto ${item.producto}.`
-      );
-
-      return;
-    }
 
   }
 
 
   /*
-    Actualizamos stock y precio de compra
-    de cada producto.
+    Una sola compra puede tener
+    varios productos.
   */
+
+  const compraId=
+    Date.now()+Math.random();
+
+
+  const fecha=
+    new Date().toISOString();
+
 
   carritoCompras.forEach(item=>{
 
-    const p=db.productos.find(
-      p=>
-        String(p.id)===
-        String(item.productoId)
-    );
-
-
-    p.stock=
-      redondear(
-        Number(p.stock||0)+
-        Number(item.cantidad||0)
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.id)
       );
 
 
-    p.compra=
+    if(!producto)return;
+
+
+    producto.stock=
+      redondear(
+
+        Number(producto.stock||0)+
+        Number(item.cantidad||0)
+
+      );
+
+
+    producto.compra=
       Number(item.precio)||0;
 
+
+    db.compras.unshift({
+
+      id:
+        compraId+
+        Math.random(),
+
+      compraGrupoId:
+        compraId,
+
+      fecha:
+        fecha,
+
+      proveedor:
+        proveedor,
+
+      producto:
+        producto.nombre,
+
+      productoId:
+        producto.id,
+
+      cantidad:
+        Number(item.cantidad),
+
+      precio:
+        Number(item.precio),
+
+      total:
+        Number(item.total)
+
+    });
+
   });
-
-
-  /*
-    Guardamos UNA sola compra con varios items.
-  */
-
-  db.compras.unshift({
-
-    id:Date.now()+Math.random(),
-
-    fecha:new Date().toISOString(),
-
-    proveedor:proveedor,
-
-    items:JSON.parse(
-      JSON.stringify(carritoCompras)
-    ),
-
-    total:total
-
-  });
-
-
-  carritoCompras=[];
 
 
   save();
+
+
+  carritoCompras=[];
 
 
   $('cProveedor').value='';
@@ -2641,76 +3423,20 @@ function finalizarCompra(){
 
   alert(
     'Compra registrada correctamente.\n\n'+
-    `Proveedor: ${proveedor}\n`+
-    `Productos: ${db.compras[0].items.length}\n`+
-    `Total: ${money(total)}`
+    'Todos los productos fueron agregados al stock.'
   );
 
 }
 
 
 /* =====================================================
-   COMPATIBILIDAD CON COMPRAS ANTIGUAS
-===================================================== */
-
-function obtenerItemsCompra(compra){
-
-  /*
-    Compras nuevas:
-    compra.items[]
-
-    Compras viejas:
-    compra.productoId
-    compra.producto
-    compra.cantidad
-    compra.precio
-  */
-
-  if(
-    Array.isArray(compra.items)
-  ){
-
-    return compra.items;
-
-  }
-
-
-  if(compra.productoId){
-
-    return [{
-
-      productoId:
-        compra.productoId,
-
-      producto:
-        compra.producto,
-
-      cantidad:
-        Number(compra.cantidad)||0,
-
-      precio:
-        Number(compra.precio)||0,
-
-      total:
-        Number(compra.total)||0
-
-    }];
-
-  }
-
-
-  return [];
-
-}
-
-
-/* =====================================================
-   LISTADO DE COMPRAS
+   LISTADO COMPRAS
 ===================================================== */
 
 function renderCompras(){
 
-  const el=$('listaCompras');
+  const el=
+    $('listaCompras');
 
 
   if(!db.compras.length){
@@ -2719,123 +3445,176 @@ function renderCompras(){
       '<span class="muted">Sin compras registradas.</span>';
 
     return;
+
   }
 
 
-  el.innerHTML=
-    db.compras
-      .slice(0,30)
-      .map(x=>{
+  /*
+    Agrupamos compras que pertenecen
+    a la misma operación.
+  */
 
-        const items=
-          obtenerItemsCompra(x);
+  const grupos=[];
+
+
+  db.compras
+    .slice()
+    .sort(
+      (a,b)=>
+        new Date(b.fecha)-
+        new Date(a.fecha)
+    )
+    .forEach(x=>{
+
+      const grupo=
+        x.compraGrupoId ||
+        x.id;
+
+
+      let existente=
+        grupos.find(
+          g=>
+            String(g.id)===
+            String(grupo)
+        );
+
+
+      if(!existente){
+
+        existente={
+
+          id:
+            grupo,
+
+          fecha:
+            x.fecha,
+
+          proveedor:
+            x.proveedor,
+
+          items:[]
+
+        };
+
+
+        grupos.push(
+          existente
+        );
+
+      }
+
+
+      existente.items.push(
+        x
+      );
+
+    });
+
+
+  el.innerHTML=
+    grupos
+      .slice(0,30)
+      .map(g=>{
+
+        const total=
+          g.items.reduce(
+            (a,x)=>
+              a+Number(x.total||0),
+            0
+          );
 
 
         return `
 
-        <div
-          class="card"
-          style="margin-bottom:8px">
+          <div
+            class="card"
+            style="margin-bottom:8px">
 
-          <div class="row">
+            <div class="row">
 
-            <span>
+              <span>
+
+                <b>
+                  🏪 ${esc(g.proveedor||'Sin proveedor')}
+                </b>
+
+                <br>
+
+                <small class="muted">
+
+                  📅
+                  ${new Date(g.fecha)
+                    .toLocaleDateString('es-AR')}
+
+                  ·
+                  ${g.items.length}
+                  producto(s)
+
+                </small>
+
+              </span>
+
 
               <b>
-                🏪 ${esc(
-                  x.proveedor ||
-                  'Sin proveedor'
-                )}
+                ${money(total)}
               </b>
 
-              <br>
+            </div>
 
-              <small class="muted">
-
-                📅
-                ${new Date(x.fecha)
-                  .toLocaleDateString('es-AR')}
-
-              </small>
-
-            </span>
-
-            <b>
-              ${money(x.total)}
-            </b>
-
-          </div>
-
-
-          <div>
 
             ${
-              items.map(item=>{
+              g.items.map(x=>`
 
-                const p=
-                  db.productos.find(
-                    p=>
-                      String(p.id)===
-                      String(item.productoId)
-                  );
+                <div
+                  class="productLine">
 
+                  <div class="row">
 
-                const up=
-                  Number(p?.unidadesPaquete)||1;
+                    <span>
 
+                      <b>
+                        ${esc(x.producto)}
+                      </b>
 
-                return `
+                      <br>
 
-                  <div
-                    style="padding:7px 0;border-bottom:1px solid #eee">
+                      <small class="muted">
 
-                    📦
+                        ${cantidad(x.cantidad)}
+                        paq.
+
+                        · Compra:
+                        ${money(x.precio)}
+
+                      </small>
+
+                    </span>
+
                     <b>
-                      ${esc(item.producto || p?.nombre || 'Producto')}
+                      ${money(x.total)}
                     </b>
-
-                    ×
-                    ${cantidad(item.cantidad)}
-                    paq.
-
-                    <br>
-
-                    <small class="muted">
-
-                      ${cantidad(
-                        Number(item.cantidad||0)*up
-                      )}
-                      unidades
-
-                      ·
-                      ${money(item.precio)}
-                      por paquete
-
-                    </small>
 
                   </div>
 
-                `;
+                </div>
 
-              }).join('')
+              `).join('')
             }
 
+
+            <div class="actions">
+
+              <button
+                class="delete"
+                onclick="eliminarCompraGrupo('${g.id}')">
+
+                🗑️ Eliminar compra completa
+
+              </button>
+
+            </div>
+
           </div>
-
-
-          <div class="actions">
-
-            <button
-              class="delete"
-              onclick="eliminarCompra('${x.id}')">
-
-              🗑️ Eliminar compra
-
-            </button>
-
-          </div>
-
-        </div>
 
         `;
 
@@ -2846,54 +3625,67 @@ function renderCompras(){
 
 
 /* =====================================================
-   BORRAR COMPRA
+   BORRAR COMPRA COMPLETA
 ===================================================== */
 
-function eliminarCompra(id){
+function eliminarCompraGrupo(id){
 
-  const compra=db.compras.find(
-    x=>String(x.id)===String(id)
-  );
-
-
-  if(!compra)return;
-
-
-  const items=
-    obtenerItemsCompra(compra);
-
-
-  if(!items.length){
-
-    alert(
-      'No se encontraron productos en esta compra.'
+  const compras=
+    db.compras.filter(
+      x=>
+        String(
+          x.compraGrupoId||
+          x.id
+        )===
+        String(id)
     );
 
-    return;
-  }
+
+  if(!compras.length)return;
+
+
+  const total=
+    compras.reduce(
+      (a,x)=>
+        a+Number(x.total||0),
+      0
+    );
 
 
   if(!confirm(
-    `¿Eliminar esta compra?\n\n`+
-    `Proveedor: ${compra.proveedor || 'Sin proveedor'}\n`+
-    `Productos: ${items.length}\n`+
-    `Total: ${money(compra.total)}\n\n`+
+
+    `¿Eliminar esta compra completa?\n\n`+
+
+    `Proveedor: ${
+      compras[0].proveedor
+    }\n`+
+
+    `Productos: ${
+      compras.length
+    }\n`+
+
+    `Total: ${
+      money(total)
+    }\n\n`+
+
     `El stock agregado por esta compra será descontado.`
+
   ))return;
 
 
   /*
-    Verificamos primero TODO el stock.
-    Así no queda una compra eliminada a medias.
+    Verificar stock de cada producto
   */
 
-  for(const item of items){
+  for(
+    const compra of compras
+  ){
 
     const producto=
       db.productos.find(
         p=>
           String(p.id)===
-          String(item.productoId)
+          String(compra.productoId)
       );
 
 
@@ -2901,19 +3693,34 @@ function eliminarCompra(id){
 
       const nuevoStock=
         Number(producto.stock||0)-
-        Number(item.cantidad||0);
+        Number(compra.cantidad||0);
 
 
-      if(nuevoStock< -0.0000001){
+      if(
+        nuevoStock<
+        -0.0000001
+      ){
 
         alert(
-          `No se puede eliminar esta compra porque el stock actual de "${producto.nombre}" `+
-          `es menor que la cantidad comprada.\n\n`+
-          `Stock actual: ${cantidad(producto.stock)} paquetes\n`+
-          `Cantidad de esta compra: ${cantidad(item.cantidad)} paquetes`
+
+          `No se puede eliminar la compra.\n\n`+
+
+          `Producto: ${
+            producto.nombre
+          }\n`+
+
+          `Stock actual: ${
+            cantidad(producto.stock)
+          } paquetes\n`+
+
+          `Cantidad de esta compra: ${
+            cantidad(compra.cantidad)
+          } paquetes`
+
         );
 
         return;
+
       }
 
     }
@@ -2922,16 +3729,16 @@ function eliminarCompra(id){
 
 
   /*
-    Ahora sí descontamos todos los productos.
+    Descontar stock
   */
 
-  for(const item of items){
+  compras.forEach(compra=>{
 
     const producto=
       db.productos.find(
         p=>
           String(p.id)===
-          String(item.productoId)
+          String(compra.productoId)
       );
 
 
@@ -2939,18 +3746,26 @@ function eliminarCompra(id){
 
       producto.stock=
         redondear(
+
           Number(producto.stock||0)-
-          Number(item.cantidad||0)
+          Number(compra.cantidad||0)
+
         );
 
     }
 
-  }
+  });
 
 
-  db.compras=db.compras.filter(
-    x=>String(x.id)!==String(id)
-  );
+  db.compras=
+    db.compras.filter(
+      x=>
+        String(
+          x.compraGrupoId||
+          x.id
+        )!==
+        String(id)
+    );
 
 
   save();
@@ -2969,7 +3784,8 @@ function eliminarCompra(id){
 
 function renderVentas(){
 
-  const el=$('listaVentas');
+  const el=
+    $('listaVentas');
 
 
   if(!db.ventas.length){
@@ -2978,6 +3794,7 @@ function renderVentas(){
       '<span class="muted">Sin ventas.</span>';
 
     return;
+
   }
 
 
@@ -3009,13 +3826,16 @@ function renderVentas(){
               <br>
 
               <small>
+
                 👤 ${esc(
-                  v.cliente ||
+                  v.cliente||
                   'Consumidor final'
                 )}
+
               </small>
 
             </span>
+
 
             <b>
               ${money(v.total)}
@@ -3074,16 +3894,20 @@ function renderVentas(){
 
 function verVenta(id){
 
-  const v=db.ventas.find(
-    x=>String(x.id)===String(id)
-  );
+  const v=
+    db.ventas.find(
+      x=>String(x.id)===String(id)
+    );
 
 
   if(!v){
 
-    alert('Venta no encontrada.');
+    alert(
+      'Venta no encontrada.'
+    );
 
     return;
+
   }
 
 
@@ -3105,14 +3929,25 @@ function verVenta(id){
 function totalVentasCliente(clienteId){
 
   return db.ventas
+
     .filter(v=>
+
       String(v.clienteId)===
-      String(clienteId) &&
+      String(clienteId)
+
+      &&
+
       v.pago==='cuenta'
+
     )
+
     .reduce(
-      (a,v)=>a+Number(v.total||0),
+
+      (a,v)=>
+        a+Number(v.total||0),
+
       0
+
     );
 
 }
@@ -3121,13 +3956,19 @@ function totalVentasCliente(clienteId){
 function totalPagosCliente(clienteId){
 
   return db.pagos
+
     .filter(p=>
       String(p.clienteId)===
       String(clienteId)
     )
+
     .reduce(
-      (a,p)=>a+Number(p.importe||0),
+
+      (a,p)=>
+        a+Number(p.importe||0),
+
       0
+
     );
 
 }
@@ -3136,8 +3977,17 @@ function totalPagosCliente(clienteId){
 function saldoCliente(clienteId){
 
   return (
-    totalVentasCliente(clienteId) -
-    totalPagosCliente(clienteId)
+
+    totalVentasCliente(
+      clienteId
+    )
+
+    -
+
+    totalPagosCliente(
+      clienteId
+    )
+
   );
 
 }
@@ -3149,17 +3999,19 @@ function saldoCliente(clienteId){
 
 function registrarPago(clienteId){
 
-  const cliente=db.clientes.find(
-    c=>String(c.id)===String(clienteId)
-  );
+  const cliente=
+    db.clientes.find(
+      c=>String(c.id)===String(clienteId)
+    );
 
 
   if(!cliente)return;
 
 
-  const saldo=saldoCliente(
-    cliente.id
-  );
+  const saldo=
+    saldoCliente(
+      cliente.id
+    );
 
 
   if(saldo<=0){
@@ -3169,57 +4021,72 @@ function registrarPago(clienteId){
     );
 
     return;
+
   }
 
 
-  const respuesta=prompt(
+  const respuesta=
+    prompt(
 
-    `Cliente: ${cliente.nombre}\n`+
-    `Saldo pendiente: ${money(saldo)}\n\n`+
-    `Ingresá el importe que paga:`
+      `Cliente: ${cliente.nombre}\n`+
+      `Saldo pendiente: ${money(saldo)}\n\n`+
+      `Ingresá el importe que paga:`
 
-  );
+    );
 
 
   if(respuesta===null)return;
 
 
-  let importe=numeroDecimal(
-    respuesta
-  );
+  const importe=
+    numeroDecimal(respuesta);
 
 
   if(
+
     !Number.isFinite(importe) ||
     importe<=0
+
   ){
 
-    alert('Importe inválido.');
+    alert(
+      'Importe inválido.'
+    );
 
     return;
+
   }
 
 
   if(importe>saldo){
 
     alert(
+
       `El pago no puede superar el saldo pendiente de ${money(saldo)}.`
+
     );
 
     return;
+
   }
 
 
-  let fechaPago=prompt(
-    'Fecha de pago (DD/MM/AAAA):',
-    new Date().toLocaleDateString('es-AR')
-  );
+  let fechaPago=
+    prompt(
+
+      'Fecha de pago (DD/MM/AAAA):',
+
+      new Date()
+        .toLocaleDateString('es-AR')
+
+    );
 
 
   if(fechaPago===null)return;
 
 
-  fechaPago=fechaPago.trim();
+  fechaPago=
+    fechaPago.trim();
 
 
   if(!fechaPago){
@@ -3229,33 +4096,48 @@ function registrarPago(clienteId){
     );
 
     return;
+
   }
 
 
-  const partes=fechaPago.split('/');
+  const partes=
+    fechaPago.split('/');
+
 
   let fechaISO='';
 
 
   if(partes.length===3){
 
-    const dia=Number(partes[0]);
-    const mes=Number(partes[1]);
-    const anio=Number(partes[2]);
+    const dia=
+      Number(partes[0]);
+
+
+    const mes=
+      Number(partes[1]);
+
+
+    const anio=
+      Number(partes[2]);
 
 
     if(
+
       dia>=1 &&
       dia<=31 &&
       mes>=1 &&
       mes<=12 &&
       anio>=2000 &&
       anio<=2100
+
     ){
 
       fechaISO=
+
         `${String(anio).padStart(4,'0')}-`+
+
         `${String(mes).padStart(2,'0')}-`+
+
         `${String(dia).padStart(2,'0')}T12:00:00`;
 
     }
@@ -3270,44 +4152,49 @@ function registrarPago(clienteId){
     );
 
     return;
+
   }
 
 
-  const detalle=prompt(
+  const detalle=
+    prompt(
 
-    'Detalle / concepto del pago:\n\n'+
-    'Ejemplos:\n'+
-    '• Pago efectivo\n'+
-    '• Transferencia\n'+
-    '• Cambio de mercadería\n'+
-    '• Entregó mercadería\n'+
-    '• Parte en efectivo + mercadería',
+      'Detalle / concepto del pago:\n\n'+
 
-    'Pago'
+      'Ejemplos:\n'+
+      '• Pago efectivo\n'+
+      '• Transferencia\n'+
+      '• Cambio de mercadería\n'+
+      '• Entregó mercadería\n'+
+      '• Parte en efectivo + mercadería',
 
-  );
+      'Pago'
+
+    );
 
 
   if(detalle===null)return;
 
 
-  const detalleFinal=
-    detalle.trim() || 'Pago';
-
-
   db.pagos.unshift({
 
-    id:Date.now()+Math.random(),
+    id:
+      Date.now()+Math.random(),
 
-    clienteId:cliente.id,
+    clienteId:
+      cliente.id,
 
-    cliente:cliente.nombre,
+    cliente:
+      cliente.nombre,
 
-    fecha:fechaISO,
+    fecha:
+      fechaISO,
 
-    importe:importe,
+    importe:
+      importe,
 
-    detalle:detalleFinal
+    detalle:
+      detalle.trim()||'Pago'
 
   });
 
@@ -3318,7 +4205,9 @@ function registrarPago(clienteId){
   alert(
 
     `Pago registrado correctamente.\n\n`+
+
     `Pagó: ${money(importe)}\n`+
+
     `Saldo restante: ${money(saldo-importe)}`
 
   );
@@ -3332,26 +4221,39 @@ function registrarPago(clienteId){
 
 function eliminarPago(id){
 
-  const pago=db.pagos.find(
-    x=>String(x.id)===String(id)
-  );
+  const pago=
+    db.pagos.find(
+      x=>String(x.id)===String(id)
+    );
 
 
   if(!pago)return;
 
 
   if(!confirm(
+
     `¿Eliminar este pago?\n\n`+
+
     `Cliente: ${pago.cliente}\n`+
+
     `Importe: ${money(pago.importe)}\n`+
-    `Fecha: ${new Date(pago.fecha).toLocaleDateString('es-AR')}\n\n`+
+
+    `Fecha: ${
+      new Date(pago.fecha)
+        .toLocaleDateString('es-AR')
+    }\n\n`+
+
     `El saldo del cliente volverá a aumentar.`
+
   ))return;
 
 
-  db.pagos=db.pagos.filter(
-    x=>String(x.id)!==String(id)
-  );
+  db.pagos=
+    db.pagos.filter(
+      x=>
+        String(x.id)!==
+        String(id)
+    );
 
 
   save();
@@ -3370,9 +4272,10 @@ function eliminarPago(id){
 
 function verEstadoCuenta(clienteId){
 
-  const cliente=db.clientes.find(
-    c=>String(c.id)===String(clienteId)
-  );
+  const cliente=
+    db.clientes.find(
+      c=>String(c.id)===String(clienteId)
+    );
 
 
   if(!cliente)return;
@@ -3382,26 +4285,37 @@ function verEstadoCuenta(clienteId){
 
 
   db.ventas
+
     .filter(v=>
+
       String(v.clienteId)===
-      String(cliente.id) &&
+      String(cliente.id)
+
+      &&
+
       v.pago==='cuenta'
+
     )
+
     .forEach(v=>{
 
       movimientos.push({
 
-        fecha:v.fecha,
+        fecha:
+          v.fecha,
 
         tipo:
           `Venta #${String(v.numero)
             .padStart(6,'0')}`,
 
-        importe:Number(v.total||0),
+        importe:
+          Number(v.total||0),
 
-        detalle:'Venta a cuenta corriente',
+        detalle:
+          'Venta a cuenta corriente',
 
-        ventaId:v.id
+        ventaId:
+          v.id
 
       });
 
@@ -3409,25 +4323,30 @@ function verEstadoCuenta(clienteId){
 
 
   db.pagos
+
     .filter(p=>
       String(p.clienteId)===
       String(cliente.id)
     )
+
     .forEach(p=>{
 
       movimientos.push({
 
-        fecha:p.fecha,
+        fecha:
+          p.fecha,
 
-        tipo:'💵 Pago',
+        tipo:
+          '💵 Pago',
 
         importe:
           -Number(p.importe||0),
 
         detalle:
-          p.detalle || 'Pago',
+          p.detalle||'Pago',
 
-        pagoId:p.id
+        pagoId:
+          p.id
 
       });
 
@@ -3445,96 +4364,108 @@ function verEstadoCuenta(clienteId){
 
 
   const filas=
-    movimientos.map(m=>{
+    movimientos
+      .map(m=>{
 
-      saldo+=m.importe;
-
-
-      const esPago=m.importe<0;
-
-
-      let accion='';
+        saldo+=
+          m.importe;
 
 
-      if(esPago){
+        const esPago=
+          m.importe<0;
 
-        accion=`
 
-          <button
-            class="delete"
-            onclick="eliminarPago('${m.pagoId}')">
+        let accion='';
 
-            🗑️
 
-          </button>
+        if(esPago){
+
+          accion=`
+
+            <button
+              class="delete"
+              onclick="eliminarPago('${m.pagoId}')">
+
+              🗑️
+
+            </button>
+
+          `;
+
+        }else{
+
+          accion=`
+
+            <button
+              class="delete"
+              onclick="eliminarVenta('${m.ventaId}')">
+
+              🗑️
+
+            </button>
+
+          `;
+
+        }
+
+
+        return `
+
+          <tr>
+
+            <td>
+
+              ${new Date(m.fecha)
+                .toLocaleDateString('es-AR')}
+
+            </td>
+
+            <td>
+
+              <b>
+                ${esc(m.tipo)}
+              </b>
+
+              <br>
+
+              <small class="muted">
+                ${esc(m.detalle)}
+              </small>
+
+            </td>
+
+            <td class="right">
+
+              ${
+                m.importe>=0
+
+                ?money(m.importe)
+
+                :'-'+
+                 money(
+                   Math.abs(m.importe)
+                 )
+
+              }
+
+            </td>
+
+            <td class="right">
+
+              ${money(saldo)}
+
+            </td>
+
+            <td>
+              ${accion}
+            </td>
+
+          </tr>
 
         `;
 
-      }else{
-
-        accion=`
-
-          <button
-            class="delete"
-            onclick="eliminarVenta('${m.ventaId}')">
-
-            🗑️
-
-          </button>
-
-        `;
-
-      }
-
-
-      return `
-
-        <tr>
-
-          <td>
-            ${new Date(m.fecha)
-              .toLocaleDateString('es-AR')}
-          </td>
-
-          <td>
-
-            <b>
-              ${esc(m.tipo)}
-            </b>
-
-            <br>
-
-            <small class="muted">
-              ${esc(m.detalle)}
-            </small>
-
-          </td>
-
-          <td class="right">
-
-            ${
-              m.importe>=0
-              ?money(m.importe)
-              :'-'+money(
-                Math.abs(m.importe)
-              )
-            }
-
-          </td>
-
-          <td class="right">
-            ${money(saldo)}
-          </td>
-
-          <td>
-            ${accion}
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join('');
+      })
+      .join('');
 
 
   $('cuentasCorrientes').innerHTML=`
@@ -3544,6 +4475,7 @@ function verEstadoCuenta(clienteId){
       <h3>
         👤 ${esc(cliente.nombre)}
       </h3>
+
 
       <div class="grid">
 
@@ -3597,7 +4529,9 @@ function verEstadoCuenta(clienteId){
 
         ${
           saldoCliente(cliente.id)>0
+
           ?`
+
             <button
               class="primary"
               onclick="registrarPago('${cliente.id}')">
@@ -3605,12 +4539,17 @@ function verEstadoCuenta(clienteId){
               💵 Registrar pago
 
             </button>
+
           `
+
           :`
+
             <div class="ok">
               ✅ Cuenta saldada
             </div>
+
           `
+
         }
 
       </div>
@@ -3624,6 +4563,7 @@ function verEstadoCuenta(clienteId){
         <tr>
 
           <th>Fecha</th>
+
           <th>Movimiento</th>
 
           <th class="right">
@@ -3640,8 +4580,12 @@ function verEstadoCuenta(clienteId){
 
 
         ${
-          filas ||
+          filas
+
+          ||
+
           `
+
             <tr>
 
               <td
@@ -3653,7 +4597,9 @@ function verEstadoCuenta(clienteId){
               </td>
 
             </tr>
+
           `
+
         }
 
       </table>
@@ -3666,18 +4612,20 @@ function verEstadoCuenta(clienteId){
 
 
 /* =====================================================
-   CUENTAS EN REPORTES
+   CUENTAS
 ===================================================== */
 
 function renderCuentas(){
 
   const pendientes=
     db.clientes.filter(
-      c=>saldoCliente(c.id)>0
+      c=>
+        saldoCliente(c.id)>0
     );
 
 
-  const el=$('cuentasCorrientes');
+  const el=
+    $('cuentasCorrientes');
 
 
   if(!pendientes.length){
@@ -3686,62 +4634,113 @@ function renderCuentas(){
       '<span class="muted">No hay cuentas corrientes pendientes.</span>';
 
     return;
+
   }
 
 
   el.innerHTML=
-    pendientes.map(c=>`
+    pendientes
+      .map(c=>`
 
-      <div
-        class="row"
-        style="border-bottom:1px solid #eee;padding:10px 0">
+        <div
+          class="row"
+          style="border-bottom:1px solid #eee;padding:10px 0">
 
-        <span>
+          <span>
 
-          👤 <b>
-            ${esc(c.nombre)}
-          </b>
-
-          <br>
-
-          <small>
-
-            Saldo:
-            <b>
-              ${money(
-                saldoCliente(c.id)
-              )}
+            👤 <b>
+              ${esc(c.nombre)}
             </b>
 
-          </small>
+            <br>
 
-        </span>
+            <small>
+
+              Saldo:
+
+              <b>
+                ${money(
+                  saldoCliente(c.id)
+                )}
+              </b>
+
+            </small>
+
+          </span>
 
 
-        <div>
+          <div>
 
-          <button
-            class="secondary"
-            onclick="verEstadoCuenta('${c.id}')">
+            <button
+              class="secondary"
+              onclick="verEstadoCuenta('${c.id}')">
 
-            📒 Estado
+              📒 Estado
 
-          </button>
+            </button>
 
 
-          <button
-            class="secondary"
-            onclick="registrarPago('${c.id}')">
+            <button
+              class="secondary"
+              onclick="registrarPago('${c.id}')">
 
-            💵 Pago
+              💵 Pago
 
-          </button>
+            </button>
+
+          </div>
 
         </div>
 
-      </div>
+      `)
+      .join('');
 
-    `).join('');
+}
+
+
+function renderInicioCuentas(){
+
+  const el=
+    $('inicioCuentas');
+
+
+  const pendientes=
+    db.clientes.filter(
+      c=>
+        saldoCliente(c.id)>0
+    );
+
+
+  if(!pendientes.length){
+
+    el.innerHTML=
+      '<span class="muted">No hay saldos pendientes.</span>';
+
+    return;
+
+  }
+
+
+  el.innerHTML=
+    pendientes
+      .map(c=>`
+
+        <div class="row">
+
+          <span>
+            👤 ${esc(c.nombre)}
+          </span>
+
+          <b>
+            ${money(
+              saldoCliente(c.id)
+            )}
+          </b>
+
+        </div>
+
+      `)
+      .join('');
 
 }
 
@@ -3752,29 +4751,37 @@ function renderCuentas(){
 
 function renderRentabilidad(){
 
-  const ventasMes=db.ventas.filter(
-    v=>
-      String(v.fecha).slice(0,7)===
-      month()
-  );
+  const ventasMes=
+    db.ventas.filter(
+      v=>
+        String(v.fecha)
+          .slice(0,7)===
+        month()
+    );
 
 
-  const ventas=ventasMes.reduce(
-    (a,v)=>a+Number(v.total||0),
-    0
-  );
+  const ventas=
+    ventasMes.reduce(
+      (a,v)=>
+        a+Number(v.total||0),
+      0
+    );
 
 
-  const costo=ventasMes.reduce(
-    (a,v)=>a+Number(v.costo||0),
-    0
-  );
+  const costo=
+    ventasMes.reduce(
+      (a,v)=>
+        a+Number(v.costo||0),
+      0
+    );
 
 
-  const ganancia=ventasMes.reduce(
-    (a,v)=>a+Number(v.ganancia||0),
-    0
-  );
+  const ganancia=
+    ventasMes.reduce(
+      (a,v)=>
+        a+Number(v.ganancia||0),
+      0
+    );
 
 
   const rentabilidad=
@@ -3843,98 +4850,129 @@ function renderRentabilidad(){
 
 function renderInicio(){
 
-  const ventasHoy=db.ventas.filter(
-    v=>
-      String(v.fecha).slice(0,10)===
-      today()
-  );
+  const ventasHoy=
+    db.ventas.filter(
+      v=>
+        String(v.fecha)
+          .slice(0,10)===
+        today()
+    );
 
 
-  const ventasMes=db.ventas.filter(
-    v=>
-      String(v.fecha).slice(0,7)===
-      month()
-  );
+  const ventasMes=
+    db.ventas.filter(
+      v=>
+        String(v.fecha)
+          .slice(0,7)===
+        month()
+    );
 
 
   $('hoyVentas').textContent=
     money(
+
       ventasHoy.reduce(
-        (a,v)=>a+Number(v.total||0),
+        (a,v)=>
+          a+Number(v.total||0),
         0
       )
+
     );
 
 
   $('hoyGanancia').textContent=
     money(
+
       ventasHoy.reduce(
-        (a,v)=>a+Number(v.ganancia||0),
+        (a,v)=>
+          a+Number(v.ganancia||0),
         0
       )
+
     );
 
 
   $('mesVentas').textContent=
     money(
+
       ventasMes.reduce(
-        (a,v)=>a+Number(v.total||0),
+        (a,v)=>
+          a+Number(v.total||0),
         0
       )
+
     );
 
 
   $('mesGanancia').textContent=
     money(
+
       ventasMes.reduce(
-        (a,v)=>a+Number(v.ganancia||0),
+        (a,v)=>
+          a+Number(v.ganancia||0),
         0
       )
+
     );
 
 
-  const bajos=db.productos.filter(
-    p=>Number(p.stock)<=5
-  );
+  const bajos=
+    db.productos.filter(
+      p=>
+        Number(p.stock)<=5
+    );
 
 
   $('stockBajo').innerHTML=
+
     bajos.length
 
     ?
 
-    bajos.map(p=>{
+    bajos
+      .map(p=>{
 
-      const up=
-        Number(p.unidadesPaquete)||1;
+        const up=
+          Number(
+            p.unidadesPaquete
+          )||1;
 
-      return `
 
-      <div class="row">
+        return `
 
-        <span>
-          ${esc(p.nombre)}
-        </span>
+          <div class="row">
 
-        <b class="${
-          Number(p.stock)===0
-          ?'dangerText'
-          :''
-        }">
+            <span>
+              ${esc(p.nombre)}
+            </span>
 
-          ${cantidad(p.stock)} paq.
+            <b class="${
+              Number(p.stock)===0
+              ?'dangerText'
+              :''
+            }">
 
-          <small class="muted">
-            (${cantidad(p.stock*up)} un.)
-          </small>
+              ${cantidad(p.stock)}
+              paq.
 
-        </b>
+              <small class="muted">
 
-      </div>
+                (${
+                  cantidad(
+                    p.stock*up
+                  )
+                } un.)
 
-      `;
+              </small>
 
-    }).join('')
+            </b>
+
+          </div>
+
+        `;
+
+      })
+      .join('')
 
     :
 
@@ -3944,49 +4982,57 @@ function renderInicio(){
 
 
 /* =====================================================
-   EXPORTAR DATOS
+   EXPORTAR
 ===================================================== */
 
 function exportarDatos(){
 
   const copia={
 
-    version:6.0,
+    version:
+      VERSION_APP,
 
     exportadoEn:
       new Date().toISOString(),
 
-    db:db
+    db:
+      db
 
   };
 
 
-  const blob=new Blob(
+  const blob=
+    new Blob(
 
-    [
-      JSON.stringify(
-        copia,
-        null,
-        2
-      )
-    ],
+      [
+        JSON.stringify(
+          copia,
+          null,
+          2
+        )
+      ],
 
-    {
-      type:'application/json'
-    }
+      {
+        type:'application/json'
+      }
 
-  );
+    );
 
 
   const url=
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
 
   const a=
-    document.createElement('a');
+    document.createElement(
+      'a'
+    );
 
 
-  a.href=url;
+  a.href=
+    url;
 
 
   a.download=
@@ -4003,7 +5049,8 @@ function exportarDatos(){
 
 
   setTimeout(
-    ()=>URL.revokeObjectURL(url),
+    ()=>
+      URL.revokeObjectURL(url),
     1000
   );
 
@@ -4011,7 +5058,7 @@ function exportarDatos(){
 
 
 /* =====================================================
-   IMPORTAR DATOS
+   IMPORTAR
 ===================================================== */
 
 function importarDatos(ev){
@@ -4038,14 +5085,26 @@ function importarDatos(ev){
 
 
       const nuevo=
-        raw?.db || raw;
+        raw?.db ||
+        raw;
 
 
       if(
+
         !nuevo ||
-        !Array.isArray(nuevo.productos) ||
-        !Array.isArray(nuevo.ventas) ||
-        !Array.isArray(nuevo.compras)
+
+        !Array.isArray(
+          nuevo.productos
+        ) ||
+
+        !Array.isArray(
+          nuevo.ventas
+        ) ||
+
+        !Array.isArray(
+          nuevo.compras
+        )
+
       ){
 
         throw new Error(
@@ -4056,7 +5115,9 @@ function importarDatos(ev){
 
 
       if(!confirm(
+
         'Esto reemplazará los datos actuales. ¿Continuar?'
+
       ))return;
 
 
@@ -4082,7 +5143,9 @@ function importarDatos(ev){
           :[],
 
         numeroVenta:
-          Number(nuevo.numeroVenta)||0
+          Number(
+            nuevo.numeroVenta
+          )||0
 
       };
 
@@ -4090,55 +5153,30 @@ function importarDatos(ev){
       db.productos.forEach(p=>{
 
         if(
+
           !Number.isFinite(
-            Number(p.unidadesPaquete)
-          ) ||
-          Number(p.unidadesPaquete)<1
+            Number(
+              p.unidadesPaquete
+            )
+          )
+
+          ||
+
+          Number(
+            p.unidadesPaquete
+          )<1
+
         ){
 
           p.unidadesPaquete=1;
 
         }
 
-        p.stock=Number(p.stock)||0;
+
+        p.stock=
+          Number(p.stock)||0;
 
       });
-
-
-      /*
-        Compatibilidad:
-        si hay clientes repetidos por diferencias
-        de mayúsculas/espacios, los unificamos.
-      */
-
-      const mapaClientes=new Map();
-
-      db.clientes.forEach(c=>{
-
-        const clave=
-          normalizarCliente(c.nombre);
-
-
-        if(!mapaClientes.has(clave)){
-
-          mapaClientes.set(
-            clave,
-            c
-          );
-
-        }
-
-      });
-
-
-      const clientesUnicos=
-        Array.from(
-          mapaClientes.values()
-        );
-
-
-      db.clientes=
-        clientesUnicos;
 
 
       localStorage.setItem(
@@ -4148,7 +5186,6 @@ function importarDatos(ev){
 
 
       carrito=[];
-
       carritoCompras=[];
 
 
@@ -4161,8 +5198,6 @@ function importarDatos(ev){
 
 
     }catch(e){
-
-      console.error(e);
 
       alert(
         'No se pudo importar el archivo.'
@@ -4188,18 +5223,20 @@ function importarDatos(ev){
 function esc(s){
 
   return String(s??'')
+
     .replace(
       /[&<>"']/g,
 
-      m=>({
+      m=>
+        ({
 
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#39;'
+          '&':'&amp;',
+          '<':'&lt;',
+          '>':'&gt;',
+          '"':'&quot;',
+          "'":'&#39;'
 
-      }[m])
+        }[m])
 
     );
 
@@ -4213,8 +5250,6 @@ function esc(s){
 function renderAll(){
 
   renderSelects();
-
-  renderClientesSelect();
 
   renderProductos();
 
@@ -4273,43 +5308,17 @@ document.addEventListener(
       );
 
 
+    $('vCliente')
+      .addEventListener(
+        'input',
+        buscarClientes
+      );
+
+
     $('cProducto')
       .addEventListener(
         'change',
         mostrarPrecioCompra
-      );
-
-
-    $('cCantidad')
-      .addEventListener(
-        'input',
-        ()=>{
-          /*
-            Permite escribir decimales con coma
-            sin bloquear el teclado del celular.
-          */
-        }
-      );
-
-
-    $('vPago')
-      .addEventListener(
-        'change',
-        ()=>{
-
-          if(
-            $('vPago').value==='pagado'
-          ){
-
-            /*
-              No borramos el cliente elegido.
-              Así el usuario puede cambiar
-              de forma de pago sin perderlo.
-            */
-
-          }
-
-        }
       );
 
 
