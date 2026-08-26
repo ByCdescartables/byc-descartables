@@ -253,6 +253,34 @@ th,td{
   font-weight:bold
 }
 
+.clientBox{
+  background:#f7f7f7;
+  border-radius:10px;
+  padding:10px;
+  margin-top:8px
+}
+
+.purchaseCart{
+  background:#f7f7f7;
+  border-radius:10px;
+  padding:10px;
+  margin-top:10px
+}
+
+.purchaseItem{
+  border-bottom:1px solid #ddd;
+  padding:10px 0
+}
+
+.purchaseItem:last-child{
+  border-bottom:0
+}
+
+.smallButton{
+  padding:7px 9px!important;
+  font-size:12px
+}
+
 @media(max-width:600px){
 
   header{
@@ -311,7 +339,7 @@ th,td{
 
 <header>
   <h1>ByC Descartables</h1>
-  <small>Sistema de gestión · versión 5.3</small>
+  <small>Sistema de gestión · versión 6.0</small>
 </header>
 
 <nav id="nav">
@@ -376,23 +404,34 @@ th,td{
     <input id="pNombre" placeholder="Ej. Bolsas de papel N°7">
 
     <label>Precio de compra por paquete</label>
-    <input id="pCompra" type="text" inputmode="decimal"
-           class="decimalInput" placeholder="Ej. 1250,50">
+    <input id="pCompra"
+           type="text"
+           inputmode="decimal"
+           class="decimalInput"
+           placeholder="Ej. 1250,50">
 
     <label>Precio de venta por paquete</label>
-    <input id="pVenta" type="text" inputmode="decimal"
-           class="decimalInput" placeholder="Ej. 1850,50">
+    <input id="pVenta"
+           type="text"
+           inputmode="decimal"
+           class="decimalInput"
+           placeholder="Ej. 1850,50">
 
     <label>Unidades por paquete</label>
-    <input id="pUnidadesPaquete" type="number"
-           min="1" step="1" value="1">
+    <input id="pUnidadesPaquete"
+           type="number"
+           min="1"
+           step="1"
+           value="1">
 
     <div class="muted">
       Ejemplo: si el paquete trae 100 bolsas, colocá 100.
     </div>
 
     <label>Stock inicial en paquetes</label>
-    <input id="pStock" type="text" inputmode="decimal"
+    <input id="pStock"
+           type="text"
+           inputmode="decimal"
            placeholder="Ej. 10,5">
 
     <button class="primary" onclick="agregarProducto()">
@@ -418,15 +457,30 @@ th,td{
 
     <h2>🛒 Nueva venta</h2>
 
-    <label>Cliente</label>
-    <input id="vCliente" placeholder="Consumidor final">
-
     <label>Forma de pago</label>
 
     <select id="vPago">
       <option value="pagado">💵 Pagado</option>
       <option value="cuenta">📒 Cuenta corriente</option>
     </select>
+
+    <label>Cliente</label>
+
+    <select id="vClienteSelect">
+      <option value="">➕ Nuevo cliente / escribir abajo</option>
+    </select>
+
+    <label>Nombre del cliente</label>
+
+    <input id="vCliente"
+           placeholder="Consumidor final">
+
+    <div class="clientBox">
+      <div class="muted">
+        Si elegís un cliente existente, la venta se asignará
+        directamente a esa cuenta.
+      </div>
+    </div>
 
     <label>Producto</label>
 
@@ -448,8 +502,7 @@ th,td{
       autocomplete="off"
       value="1"
       class="decimalInput"
-      placeholder="Ej. 0,3"
-    >
+      placeholder="Ej. 0,3">
 
     <div class="muted">
       Podés escribir decimales con coma o punto.
@@ -464,8 +517,7 @@ th,td{
       inputmode="decimal"
       autocomplete="off"
       class="decimalInput"
-      placeholder="Ej. 1850,50"
-    >
+      placeholder="Ej. 1850,50">
 
     <div id="vInfo" class="infoBox"></div>
 
@@ -535,8 +587,7 @@ th,td{
 
     <input
       id="cProveedor"
-      placeholder="Ej. Distribuidora San Rafael"
-    >
+      placeholder="Ej. Distribuidora San Rafael">
 
     <label>Producto</label>
 
@@ -548,9 +599,9 @@ th,td{
       id="cCantidad"
       type="text"
       inputmode="decimal"
+      autocomplete="off"
       class="decimalInput"
-      value="1"
-    >
+      value="1">
 
     <label>Precio de compra por paquete</label>
 
@@ -558,14 +609,31 @@ th,td{
       id="cPrecio"
       type="text"
       inputmode="decimal"
+      autocomplete="off"
       class="decimalInput"
-      placeholder="Ej. 1250,50"
-    >
+      placeholder="Ej. 1250,50">
 
     <div id="cInfo" class="infoBox"></div>
 
-    <button class="primary" onclick="registrarCompra()">
-      ➕ Registrar compra
+    <button class="primary" onclick="agregarCompraAlCarrito()">
+      ➕ Agregar producto a la compra
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h3>🛍️ Compra actual</h3>
+
+    <div id="carritoCompras" class="purchaseCart">
+      <span class="muted">
+        No hay productos agregados a la compra.
+      </span>
+    </div>
+
+    <button class="primary" onclick="finalizarCompra()">
+      ✅ Registrar compra completa
     </button>
 
   </div>
@@ -636,8 +704,7 @@ th,td{
       type="file"
       accept="application/json,.json"
       style="display:none"
-      onchange="importarDatos(event)"
-    >
+      onchange="importarDatos(event)">
 
     <p class="muted">
       ⚠️ Importar reemplaza los datos actuales.
@@ -661,6 +728,7 @@ const KEY='byc_demo_v3';
 const OLD_KEY='byc_demo_v2';
 
 let carrito=[];
+let carritoCompras=[];
 let db=null;
 
 try{
@@ -728,12 +796,12 @@ db.productos.forEach(p=>{
 });
 
 
-const $=id=>document.getElementById(id);
-
-
 /* =====================================================
    UTILIDADES
 ===================================================== */
+
+const $=id=>document.getElementById(id);
+
 
 function money(n){
 
@@ -749,15 +817,6 @@ function money(n){
 }
 
 
-/* =====================================================
-   DECIMALES
-   Acepta:
-   0,3
-   0.3
-   1,25
-   1.25
-===================================================== */
-
 function numeroDecimal(valor){
 
   if(valor===null || valor===undefined){
@@ -771,11 +830,6 @@ function numeroDecimal(valor){
   if(!texto){
     return NaN;
   }
-
-  /*
-    Si tiene coma y punto:
-    1.250,50 -> 1250.50
-  */
 
   if(
     texto.includes('.') &&
@@ -1176,6 +1230,11 @@ function eliminarProducto(id){
       )
     ) ||
     db.compras.some(c=>
+      c.items?.some(i=>
+        String(i.productoId)===String(id)
+      )
+    ) ||
+    db.compras.some(c=>
       String(c.productoId)===String(id)
     );
 
@@ -1188,7 +1247,7 @@ function eliminarProducto(id){
 
     mensaje+=
       '⚠️ Este producto tiene ventas o compras registradas.\n'+
-      'Se eliminará del listado de productos, pero se conservará el historial.\n\n';
+      'Se eliminará del listado, pero se conservará el historial.\n\n';
 
   }
 
@@ -1206,6 +1265,11 @@ function eliminarProducto(id){
 
   carrito=carrito.filter(
     x=>String(x.id)!==String(id)
+  );
+
+
+  carritoCompras=carritoCompras.filter(
+    x=>String(x.productoId)!==String(id)
   );
 
 
@@ -1230,11 +1294,9 @@ function renderSelects(){
     return `
 
       <option value="${p.id}">
-
         ${esc(p.nombre)}
         — ${money(p.venta)}
         — stock ${cantidad(p.stock)} paq.
-
       </option>
 
     `;
@@ -1254,6 +1316,53 @@ function renderSelects(){
 
   mostrarPrecio();
   mostrarPrecioCompra();
+
+}
+
+
+function renderClientesSelect(){
+
+  const select=$('vClienteSelect');
+
+  const actual=select.value;
+
+  select.innerHTML=`
+
+    <option value="">
+      ➕ Nuevo cliente / escribir abajo
+    </option>
+
+    ${
+      db.clientes
+      .slice()
+      .sort((a,b)=>
+        String(a.nombre).localeCompare(
+          String(b.nombre),
+          'es'
+        )
+      )
+      .map(c=>`
+
+        <option value="${c.id}">
+          👤 ${esc(c.nombre)}
+          · Saldo ${money(saldoCliente(c.id))}
+        </option>
+
+      `).join('')
+    }
+
+  `;
+
+  if(
+    actual &&
+    db.clientes.some(
+      c=>String(c.id)===String(actual)
+    )
+  ){
+
+    select.value=actual;
+
+  }
 
 }
 
@@ -1325,13 +1434,6 @@ function mostrarPrecio(){
     return;
   }
 
-
-  /*
-    IMPORTANTE:
-    El precio se coloca como texto.
-    Esto permite trabajar correctamente
-    con coma decimal en iPhone.
-  */
 
   $('vPrecio').value=
     String(p.venta).replace('.',',');
@@ -1517,6 +1619,37 @@ function obtenerCliente(id){
 
 
 /* =====================================================
+   CLIENTE SELECCIONADO
+===================================================== */
+
+$('vClienteSelect')?.addEventListener(
+  'change',
+  function(){
+
+    const id=this.value;
+
+    if(!id){
+
+      $('vCliente').value='';
+
+      return;
+    }
+
+
+    const cliente=obtenerCliente(id);
+
+    if(cliente){
+
+      $('vCliente').value=
+        cliente.nombre;
+
+    }
+
+  }
+);
+
+
+/* =====================================================
    VENTAS
 ===================================================== */
 
@@ -1620,8 +1753,7 @@ function agregarAlCarrito(){
 
     nombre:producto.nombre,
 
-    cantidad:
-      cantidadIngresada,
+    cantidad:cantidadIngresada,
 
     tipoCantidad:
       $('vTipoCantidad').value,
@@ -1792,40 +1924,53 @@ function finalizarVenta(){
   );
 
 
-  const nombreCliente=
-    $('vCliente').value.trim() ||
-    'Consumidor final';
-
-
   const formaPago=$('vPago').value;
 
 
   let cliente=null;
 
+  const clienteSeleccionado=
+    $('vClienteSelect').value;
 
-  if(
-    formaPago==='cuenta' ||
-    nombreCliente!=='Consumidor final'
-  ){
 
-    cliente=registrarCliente(
-      nombreCliente
-    );
+  if(clienteSeleccionado){
+
+    cliente=
+      obtenerCliente(
+        clienteSeleccionado
+      );
 
   }
 
 
-  if(
-    formaPago==='cuenta' &&
-    !cliente
-  ){
+  const textoCliente=
+    $('vCliente').value.trim();
+
+
+  if(!cliente && textoCliente){
+
+    cliente=
+      registrarCliente(
+        textoCliente
+      );
+
+  }
+
+
+  if(!cliente && formaPago==='cuenta'){
 
     alert(
-      'Para una cuenta corriente tenés que indicar el cliente.'
+      'Para una cuenta corriente tenés que seleccionar o indicar un cliente.'
     );
 
     return;
   }
+
+
+  const nombreCliente=
+    cliente?.nombre ||
+    textoCliente ||
+    'Consumidor final';
 
 
   for(const item of carrito){
@@ -1907,13 +2052,15 @@ function finalizarVenta(){
   db.ventas.unshift(venta);
 
 
-  save();
-
-
   carrito=[];
 
 
+  save();
+
+
   $('vCliente').value='';
+
+  $('vClienteSelect').value='';
 
   $('vPago').value='pagado';
 
@@ -2166,14 +2313,10 @@ async function compartir(){
 
 
 /* =====================================================
-   COMPRAS
+   COMPRAS MULTIPRODUCTO
 ===================================================== */
 
-function registrarCompra(){
-
-  const proveedor=
-    $('cProveedor').value.trim();
-
+function agregarCompraAlCarrito(){
 
   const producto=db.productos.find(
     p=>String(p.id)===$('cProducto').value
@@ -2193,7 +2336,6 @@ function registrarCompra(){
 
 
   if(
-    !proveedor ||
     !producto ||
     !Number.isFinite(cantidadCompra) ||
     cantidadCompra<=0 ||
@@ -2202,21 +2344,269 @@ function registrarCompra(){
   ){
 
     alert(
-      'Completá proveedor, producto, cantidad y precio correctamente.'
+      'Completá correctamente producto, cantidad y precio.'
     );
 
     return;
   }
 
 
-  producto.stock=
-    redondear(
-      Number(producto.stock)+cantidadCompra
+  const existente=
+    carritoCompras.find(
+      x=>
+        String(x.productoId)===
+        String(producto.id)
     );
 
 
-  producto.compra=precio;
+  if(existente){
 
+    existente.cantidad=
+      redondear(
+        Number(existente.cantidad)+
+        cantidadCompra
+      );
+
+    existente.precio=precio;
+
+    existente.total=
+      existente.cantidad*existente.precio;
+
+  }else{
+
+    carritoCompras.push({
+
+      productoId:producto.id,
+
+      producto:producto.nombre,
+
+      cantidad:cantidadCompra,
+
+      precio:precio,
+
+      total:cantidadCompra*precio
+
+    });
+
+  }
+
+
+  renderCarritoCompras();
+
+
+  $('cCantidad').value='1';
+
+}
+
+
+function renderCarritoCompras(){
+
+  const el=$('carritoCompras');
+
+
+  if(!carritoCompras.length){
+
+    el.innerHTML=
+      '<span class="muted">No hay productos agregados a la compra.</span>';
+
+    return;
+  }
+
+
+  const total=
+    carritoCompras.reduce(
+      (a,x)=>a+Number(x.total||0),
+      0
+    );
+
+
+  el.innerHTML=`
+
+    <table>
+
+      <tr>
+
+        <th>Producto</th>
+
+        <th>Cantidad</th>
+
+        <th>Precio</th>
+
+        <th>Total</th>
+
+        <th></th>
+
+      </tr>
+
+
+      ${
+        carritoCompras.map((x,i)=>{
+
+          const p=
+            db.productos.find(
+              p=>
+                String(p.id)===
+                String(x.productoId)
+            );
+
+
+          const up=
+            Number(p?.unidadesPaquete)||1;
+
+
+          return `
+
+            <tr>
+
+              <td>
+                ${esc(x.producto)}
+              </td>
+
+              <td>
+                ${cantidad(x.cantidad)} paq.
+                <br>
+                <small class="muted">
+                  ${cantidad(x.cantidad*up)} un.
+                </small>
+              </td>
+
+              <td>
+                ${money(x.precio)}
+              </td>
+
+              <td>
+                ${money(x.total)}
+              </td>
+
+              <td>
+
+                <button
+                  class="delete"
+                  onclick="quitarCompraDelCarrito(${i})">
+
+                  ✕
+
+                </button>
+
+              </td>
+
+            </tr>
+
+          `;
+
+        }).join('')
+      }
+
+    </table>
+
+
+    <div class="total right">
+      TOTAL COMPRA ${money(total)}
+    </div>
+
+  `;
+
+}
+
+
+function quitarCompraDelCarrito(i){
+
+  carritoCompras.splice(i,1);
+
+  renderCarritoCompras();
+
+}
+
+
+function finalizarCompra(){
+
+  const proveedor=
+    $('cProveedor').value.trim();
+
+
+  if(!proveedor){
+
+    alert(
+      'Ingresá el proveedor.'
+    );
+
+    return;
+  }
+
+
+  if(!carritoCompras.length){
+
+    alert(
+      'Agregá al menos un producto a la compra.'
+    );
+
+    return;
+  }
+
+
+  const total=
+    carritoCompras.reduce(
+      (a,x)=>a+Number(x.total||0),
+      0
+    );
+
+
+  /*
+    Primero verificamos que todos los productos
+    sigan existiendo.
+  */
+
+  for(const item of carritoCompras){
+
+    const p=db.productos.find(
+      p=>
+        String(p.id)===
+        String(item.productoId)
+    );
+
+
+    if(!p){
+
+      alert(
+        `No se encontró el producto ${item.producto}.`
+      );
+
+      return;
+    }
+
+  }
+
+
+  /*
+    Actualizamos stock y precio de compra
+    de cada producto.
+  */
+
+  carritoCompras.forEach(item=>{
+
+    const p=db.productos.find(
+      p=>
+        String(p.id)===
+        String(item.productoId)
+    );
+
+
+    p.stock=
+      redondear(
+        Number(p.stock||0)+
+        Number(item.cantidad||0)
+      );
+
+
+    p.compra=
+      Number(item.precio)||0;
+
+  });
+
+
+  /*
+    Guardamos UNA sola compra con varios items.
+  */
 
   db.compras.unshift({
 
@@ -2226,17 +2616,16 @@ function registrarCompra(){
 
     proveedor:proveedor,
 
-    producto:producto.nombre,
+    items:JSON.parse(
+      JSON.stringify(carritoCompras)
+    ),
 
-    productoId:producto.id,
-
-    cantidad:cantidadCompra,
-
-    precio:precio,
-
-    total:cantidadCompra*precio
+    total:total
 
   });
+
+
+  carritoCompras=[];
 
 
   save();
@@ -2247,12 +2636,77 @@ function registrarCompra(){
   $('cCantidad').value='1';
 
 
+  renderCarritoCompras();
+
+
   alert(
-    'Compra registrada y stock actualizado.'
+    'Compra registrada correctamente.\n\n'+
+    `Proveedor: ${proveedor}\n`+
+    `Productos: ${db.compras[0].items.length}\n`+
+    `Total: ${money(total)}`
   );
 
 }
 
+
+/* =====================================================
+   COMPATIBILIDAD CON COMPRAS ANTIGUAS
+===================================================== */
+
+function obtenerItemsCompra(compra){
+
+  /*
+    Compras nuevas:
+    compra.items[]
+
+    Compras viejas:
+    compra.productoId
+    compra.producto
+    compra.cantidad
+    compra.precio
+  */
+
+  if(
+    Array.isArray(compra.items)
+  ){
+
+    return compra.items;
+
+  }
+
+
+  if(compra.productoId){
+
+    return [{
+
+      productoId:
+        compra.productoId,
+
+      producto:
+        compra.producto,
+
+      cantidad:
+        Number(compra.cantidad)||0,
+
+      precio:
+        Number(compra.precio)||0,
+
+      total:
+        Number(compra.total)||0
+
+    }];
+
+  }
+
+
+  return [];
+
+}
+
+
+/* =====================================================
+   LISTADO DE COMPRAS
+===================================================== */
 
 function renderCompras(){
 
@@ -2273,15 +2727,8 @@ function renderCompras(){
       .slice(0,30)
       .map(x=>{
 
-        const p=db.productos.find(
-          p=>
-            String(p.id)===
-            String(x.productoId)
-        );
-
-
-        const up=
-          Number(p?.unidadesPaquete)||1;
+        const items=
+          obtenerItemsCompra(x);
 
 
         return `
@@ -2295,41 +2742,19 @@ function renderCompras(){
             <span>
 
               <b>
-                ${esc(x.producto)}
+                🏪 ${esc(
+                  x.proveedor ||
+                  'Sin proveedor'
+                )}
               </b>
-
-              × ${cantidad(x.cantidad)} paq.
 
               <br>
 
               <small class="muted">
 
-                📦
-                ${cantidad(x.cantidad*up)}
-                unidades
-
-                <br>
-
                 📅
                 ${new Date(x.fecha)
                   .toLocaleDateString('es-AR')}
-
-                · 💰 Compra:
-                ${money(x.precio)}
-
-              </small>
-
-              <br>
-
-              <small>
-
-                🏪 Proveedor:
-                <b>
-                  ${esc(
-                    x.proveedor ||
-                    'Sin proveedor'
-                  )}
-                </b>
 
               </small>
 
@@ -2338,6 +2763,62 @@ function renderCompras(){
             <b>
               ${money(x.total)}
             </b>
+
+          </div>
+
+
+          <div>
+
+            ${
+              items.map(item=>{
+
+                const p=
+                  db.productos.find(
+                    p=>
+                      String(p.id)===
+                      String(item.productoId)
+                  );
+
+
+                const up=
+                  Number(p?.unidadesPaquete)||1;
+
+
+                return `
+
+                  <div
+                    style="padding:7px 0;border-bottom:1px solid #eee">
+
+                    📦
+                    <b>
+                      ${esc(item.producto || p?.nombre || 'Producto')}
+                    </b>
+
+                    ×
+                    ${cantidad(item.cantidad)}
+                    paq.
+
+                    <br>
+
+                    <small class="muted">
+
+                      ${cantidad(
+                        Number(item.cantidad||0)*up
+                      )}
+                      unidades
+
+                      ·
+                      ${money(item.precio)}
+                      por paquete
+
+                    </small>
+
+                  </div>
+
+                `;
+
+              }).join('')
+            }
 
           </div>
 
@@ -2378,44 +2859,91 @@ function eliminarCompra(id){
   if(!compra)return;
 
 
+  const items=
+    obtenerItemsCompra(compra);
+
+
+  if(!items.length){
+
+    alert(
+      'No se encontraron productos en esta compra.'
+    );
+
+    return;
+  }
+
+
   if(!confirm(
     `¿Eliminar esta compra?\n\n`+
-    `Producto: ${compra.producto}\n`+
-    `Cantidad: ${cantidad(compra.cantidad)} paquetes\n`+
+    `Proveedor: ${compra.proveedor || 'Sin proveedor'}\n`+
+    `Productos: ${items.length}\n`+
     `Total: ${money(compra.total)}\n\n`+
     `El stock agregado por esta compra será descontado.`
   ))return;
 
 
-  const producto=db.productos.find(
-    p=>
-      String(p.id)===
-      String(compra.productoId)
-  );
+  /*
+    Verificamos primero TODO el stock.
+    Así no queda una compra eliminada a medias.
+  */
 
+  for(const item of items){
 
-  if(producto){
-
-    const nuevoStock=
-      Number(producto.stock||0)-
-      Number(compra.cantidad||0);
-
-
-    if(nuevoStock< -0.0000001){
-
-      alert(
-        `No se puede eliminar esta compra porque el stock actual de "${producto.nombre}" `+
-        `es menor que la cantidad de esta compra.\n\n`+
-        `Stock actual: ${cantidad(producto.stock)} paquetes\n`+
-        `Cantidad de la compra: ${cantidad(compra.cantidad)} paquetes`
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.productoId)
       );
 
-      return;
+
+    if(producto){
+
+      const nuevoStock=
+        Number(producto.stock||0)-
+        Number(item.cantidad||0);
+
+
+      if(nuevoStock< -0.0000001){
+
+        alert(
+          `No se puede eliminar esta compra porque el stock actual de "${producto.nombre}" `+
+          `es menor que la cantidad comprada.\n\n`+
+          `Stock actual: ${cantidad(producto.stock)} paquetes\n`+
+          `Cantidad de esta compra: ${cantidad(item.cantidad)} paquetes`
+        );
+
+        return;
+      }
+
     }
 
+  }
 
-    producto.stock=
-      redondear(nuevoStock);
+
+  /*
+    Ahora sí descontamos todos los productos.
+  */
+
+  for(const item of items){
+
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.productoId)
+      );
+
+
+    if(producto){
+
+      producto.stock=
+        redondear(
+          Number(producto.stock||0)-
+          Number(item.cantidad||0)
+        );
+
+    }
 
   }
 
@@ -3218,48 +3746,6 @@ function renderCuentas(){
 }
 
 
-function renderInicioCuentas(){
-
-  const el=$('inicioCuentas');
-
-
-  const pendientes=
-    db.clientes.filter(
-      c=>saldoCliente(c.id)>0
-    );
-
-
-  if(!pendientes.length){
-
-    el.innerHTML=
-      '<span class="muted">No hay saldos pendientes.</span>';
-
-    return;
-  }
-
-
-  el.innerHTML=
-    pendientes.map(c=>`
-
-      <div class="row">
-
-        <span>
-          👤 ${esc(c.nombre)}
-        </span>
-
-        <b>
-          ${money(
-            saldoCliente(c.id)
-          )}
-        </b>
-
-      </div>
-
-    `).join('');
-
-}
-
-
 /* =====================================================
    RENTABILIDAD
 ===================================================== */
@@ -3465,7 +3951,7 @@ function exportarDatos(){
 
   const copia={
 
-    version:5.3,
+    version:6.0,
 
     exportadoEn:
       new Date().toISOString(),
@@ -3619,6 +4105,42 @@ function importarDatos(ev){
       });
 
 
+      /*
+        Compatibilidad:
+        si hay clientes repetidos por diferencias
+        de mayúsculas/espacios, los unificamos.
+      */
+
+      const mapaClientes=new Map();
+
+      db.clientes.forEach(c=>{
+
+        const clave=
+          normalizarCliente(c.nombre);
+
+
+        if(!mapaClientes.has(clave)){
+
+          mapaClientes.set(
+            clave,
+            c
+          );
+
+        }
+
+      });
+
+
+      const clientesUnicos=
+        Array.from(
+          mapaClientes.values()
+        );
+
+
+      db.clientes=
+        clientesUnicos;
+
+
       localStorage.setItem(
         KEY,
         JSON.stringify(db)
@@ -3626,6 +4148,8 @@ function importarDatos(ev){
 
 
       carrito=[];
+
+      carritoCompras=[];
 
 
       renderAll();
@@ -3637,6 +4161,8 @@ function importarDatos(ev){
 
 
     }catch(e){
+
+      console.error(e);
 
       alert(
         'No se pudo importar el archivo.'
@@ -3688,6 +4214,8 @@ function renderAll(){
 
   renderSelects();
 
+  renderClientesSelect();
+
   renderProductos();
 
   renderCompras();
@@ -3703,6 +4231,8 @@ function renderAll(){
   renderInicioCuentas();
 
   renderCarrito();
+
+  renderCarritoCompras();
 
 }
 
@@ -3747,6 +4277,39 @@ document.addEventListener(
       .addEventListener(
         'change',
         mostrarPrecioCompra
+      );
+
+
+    $('cCantidad')
+      .addEventListener(
+        'input',
+        ()=>{
+          /*
+            Permite escribir decimales con coma
+            sin bloquear el teclado del celular.
+          */
+        }
+      );
+
+
+    $('vPago')
+      .addEventListener(
+        'change',
+        ()=>{
+
+          if(
+            $('vPago').value==='pagado'
+          ){
+
+            /*
+              No borramos el cliente elegido.
+              Así el usuario puede cambiar
+              de forma de pago sin perderlo.
+            */
+
+          }
+
+        }
       );
 
 
