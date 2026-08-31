@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -317,7 +317,7 @@ th,td{
 
 <header>
   <h1>ByC Descartables</h1>
-  <small>Sistema de gestión · versión 6.0</small>
+  <small>Sistema de gestión · versión 6.1</small>
 </header>
 
 <nav id="nav">
@@ -582,41 +582,47 @@ th,td{
     <h2>🛍️ Nueva compra</h2>
 
     <label>Proveedor</label>
-
     <input id="cProveedor"
            placeholder="Ej. Distribuidora San Rafael">
 
     <label>Producto</label>
-
     <select id="cProducto"></select>
 
     <label>Cantidad comprada en paquetes</label>
-
-    <input
-      id="cCantidad"
-      type="text"
-      inputmode="decimal"
-      class="decimalInput"
-      value="1">
+    <input id="cCantidad"
+           type="text"
+           inputmode="decimal"
+           class="decimalInput"
+           value="1">
 
     <label>Precio de compra por paquete</label>
-
-    <input
-      id="cPrecio"
-      type="text"
-      inputmode="decimal"
-      class="decimalInput"
-      placeholder="Ej. 1250,50">
+    <input id="cPrecio"
+           type="text"
+           inputmode="decimal"
+           class="decimalInput"
+           placeholder="Ej. 1250,50">
 
     <div id="cInfo" class="infoBox"></div>
 
     <button class="primary"
-            onclick="registrarCompra()">
-      ➕ Agregar compra
+            onclick="agregarCompraAlCarrito()">
+      ➕ Agregar producto a la compra
     </button>
 
   </div>
 
+  <div class="card">
+
+    <h3>Compra actual</h3>
+
+    <div id="compraCarrito"></div>
+
+    <button class="primary"
+            onclick="finalizarCompra()">
+      ✅ Finalizar compra
+    </button>
+
+  </div>
 
   <div class="card">
 
@@ -700,7 +706,7 @@ th,td{
    VERSION
 ===================================================== */
 
-const APP_VERSION='6.0';
+const APP_VERSION='6.1';
 
 
 /* =====================================================
@@ -711,6 +717,7 @@ const KEY='byc_demo_v3';
 const OLD_KEY='byc_demo_v2';
 
 let carrito=[];
+let compraCarrito=[];
 let db=null;
 
 try{
@@ -1243,7 +1250,10 @@ function eliminarProducto(id){
       )
     ) ||
     db.compras.some(c=>
-      String(c.productoId)===String(id)
+      String(c.productoId)===String(id) ||
+      c.items?.some(i=>
+        String(i.productoId)===String(id)
+      )
     );
 
 
@@ -1911,6 +1921,7 @@ function agregarAlCarrito(){
 
 
   renderCarrito();
+  renderCompraCarrito();
 
 }
 
@@ -2480,11 +2491,10 @@ async function compartir(){
    COMPRAS
 ===================================================== */
 
-function registrarCompra(){
+function agregarCompraAlCarrito(){
 
   const proveedor=
     $('cProveedor').value.trim();
-
 
   const producto=
     db.productos.find(
@@ -2493,18 +2503,15 @@ function registrarCompra(){
         String($('cProducto').value)
     );
 
-
   const cantidadCompra=
     numeroDecimal(
       $('cCantidad').value
     );
 
-
   const precio=
     numeroDecimal(
       $('cPrecio').value
     );
-
 
   if(
     !proveedor ||
@@ -2522,16 +2529,200 @@ function registrarCompra(){
     return;
   }
 
+  const yaCantidad=
+    compraCarrito
+      .filter(x=>
+        String(x.productoId)===String(producto.id)
+      )
+      .reduce(
+        (a,x)=>a+Number(x.cantidad||0),
+        0
+      );
 
-  producto.stock=
-    redondear(
-      Number(producto.stock)+
-      cantidadCompra
+  compraCarrito.push({
+
+    productoId:producto.id,
+
+    producto:producto.nombre,
+
+    cantidad:
+      redondear(cantidadCompra),
+
+    precio,
+
+    unidadesPaquete:
+      Number(producto.unidadesPaquete)||1,
+
+    total:
+      redondear(cantidadCompra*precio)
+
+  });
+
+  $('cCantidad').value='1';
+
+  renderCompraCarrito();
+
+  alert(
+    `${producto.nombre} agregado a la compra.`
+  );
+
+}
+
+
+function renderCompraCarrito(){
+
+  const el=$('compraCarrito');
+
+  if(!compraCarrito.length){
+
+    el.innerHTML=
+      '<span class="muted">No hay productos agregados.</span>';
+
+    return;
+  }
+
+  const total=
+    compraCarrito.reduce(
+      (a,x)=>
+        a+Number(x.total||0),
+      0
     );
 
+  el.innerHTML=`
 
-  producto.compra=precio;
+    <table>
 
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+        <th>Total</th>
+        <th></th>
+      </tr>
+
+      ${
+        compraCarrito.map((x,i)=>`
+
+          <tr>
+
+            <td>
+              <b>${esc(x.producto)}</b>
+            </td>
+
+            <td>
+              ${cantidad(x.cantidad)} paq.
+            </td>
+
+            <td>
+              ${money(x.precio)}
+            </td>
+
+            <td>
+              ${money(x.total)}
+            </td>
+
+            <td>
+              <button
+                class="delete"
+                onclick="quitarCompraDelCarrito(${i})">
+                ✕
+              </button>
+            </td>
+
+          </tr>
+
+        `).join('')
+      }
+
+    </table>
+
+    <div class="total right">
+      TOTAL ${money(total)}
+    </div>
+
+  `;
+
+}
+
+
+function quitarCompraDelCarrito(i){
+
+  compraCarrito.splice(i,1);
+
+  renderCompraCarrito();
+
+}
+
+
+function finalizarCompra(){
+
+  const proveedor=
+    $('cProveedor').value.trim();
+
+  if(!proveedor){
+
+    alert(
+      'Ingresá el proveedor antes de finalizar la compra.'
+    );
+
+    return;
+  }
+
+  if(!compraCarrito.length){
+
+    alert(
+      'Agregá al menos un producto a la compra.'
+    );
+
+    return;
+  }
+
+  const total=
+    compraCarrito.reduce(
+      (a,x)=>
+        a+Number(x.total||0),
+      0
+    );
+
+  for(const item of compraCarrito){
+
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.productoId)
+      );
+
+    if(!producto){
+
+      alert(
+        `No se encontró el producto ${item.producto}.`
+      );
+
+      return;
+    }
+
+  }
+
+  compraCarrito.forEach(item=>{
+
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.productoId)
+      );
+
+    producto.stock=
+      redondear(
+        Number(producto.stock||0)+
+        Number(item.cantidad||0)
+      );
+
+    producto.compra=
+      Number(item.precio)||0;
+
+  });
 
   db.compras.unshift({
 
@@ -2541,27 +2732,26 @@ function registrarCompra(){
 
     proveedor,
 
-    producto:producto.nombre,
+    tipo:'multiple',
 
-    productoId:producto.id,
+    items:
+      JSON.parse(
+        JSON.stringify(compraCarrito)
+      ),
 
-    cantidad:cantidadCompra,
-
-    precio,
-
-    total:
-      cantidadCompra*precio
+    total:total
 
   });
 
-
   save();
 
+  compraCarrito=[];
 
   $('cProveedor').value='';
 
   $('cCantidad').value='1';
 
+  renderCompraCarrito();
 
   alert(
     'Compra registrada y stock actualizado.'
@@ -2575,7 +2765,6 @@ function renderCompras(){
   const el=
     $('listaCompras');
 
-
   if(!db.compras.length){
 
     el.innerHTML=
@@ -2584,11 +2773,103 @@ function renderCompras(){
     return;
   }
 
-
   el.innerHTML=
     db.compras
-      .slice(0,30)
       .map(x=>{
+
+        /* Compras nuevas con varios productos */
+        if(Array.isArray(x.items)){
+
+          return `
+
+            <div
+              class="card"
+              style="margin-bottom:8px">
+
+              <div class="row">
+
+                <span>
+
+                  <b>
+                    🛍️ Compra
+                  </b>
+
+                  <br>
+
+                  <small class="muted">
+
+                    📅
+                    ${new Date(x.fecha)
+                      .toLocaleDateString('es-AR')}
+
+                    · 🏪
+                    <b>${esc(
+                      x.proveedor||
+                      'Sin proveedor'
+                    )}</b>
+
+                  </small>
+
+                </span>
+
+                <b>
+                  ${money(x.total)}
+                </b>
+
+              </div>
+
+              <div class="infoBox">
+
+                ${
+                  x.items.map(item=>`
+
+                    <div class="row">
+
+                      <span>
+                        <b>
+                          ${esc(item.producto)}
+                        </b>
+
+                        <br>
+
+                        <small class="muted">
+                          ${cantidad(item.cantidad)}
+                          paq.
+                          · ${money(item.precio)}
+                          c/u
+                        </small>
+                      </span>
+
+                      <b>
+                        ${money(item.total)}
+                      </b>
+
+                    </div>
+
+                  `).join('')
+                }
+
+              </div>
+
+              <div class="actions">
+
+                <button
+                  class="delete"
+                  onclick="eliminarCompra('${x.id}')">
+
+                  🗑️ Eliminar compra
+
+                </button>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+
+        /* Compras antiguas: se conservan y siguen funcionando */
 
         const p=
           db.productos.find(
@@ -2597,81 +2878,79 @@ function renderCompras(){
               String(x.productoId)
           );
 
-
         const up=
           Number(p?.unidadesPaquete)||1;
 
-
         return `
 
-        <div
-          class="card"
-          style="margin-bottom:8px">
+          <div
+            class="card"
+            style="margin-bottom:8px">
 
-          <div class="row">
+            <div class="row">
 
-            <span>
+              <span>
 
-              <b>
-                ${esc(x.producto)}
-              </b>
+                <b>
+                  ${esc(x.producto)}
+                </b>
 
-              × ${cantidad(x.cantidad)} paq.
-
-              <br>
-
-              <small class="muted">
-
-                📦
-                ${cantidad(x.cantidad*up)}
-                unidades
+                × ${cantidad(x.cantidad)} paq.
 
                 <br>
 
-                📅
-                ${new Date(x.fecha)
-                  .toLocaleDateString('es-AR')}
+                <small class="muted">
 
-                · 💰 Compra:
-                ${money(x.precio)}
+                  📦
+                  ${cantidad(x.cantidad*up)}
+                  unidades
 
-              </small>
+                  <br>
 
-              <br>
+                  📅
+                  ${new Date(x.fecha)
+                    .toLocaleDateString('es-AR')}
 
-              <small>
+                  · 💰 Compra:
+                  ${money(x.precio)}
 
-                🏪 Proveedor:
-                <b>
-                  ${esc(
-                    x.proveedor||
-                    'Sin proveedor'
-                  )}
-                </b>
+                </small>
 
-              </small>
+                <br>
 
-            </span>
+                <small>
 
-            <b>
-              ${money(x.total)}
-            </b>
+                  🏪 Proveedor:
+                  <b>
+                    ${esc(
+                      x.proveedor||
+                      'Sin proveedor'
+                    )}
+                  </b>
+
+                </small>
+
+              </span>
+
+              <b>
+                ${money(x.total)}
+              </b>
+
+            </div>
+
+            <div class="actions">
+
+              <button
+                class="delete"
+                onclick="eliminarCompra('${x.id}')">
+
+                🗑️ Eliminar compra
+
+              </button>
+
+            </div>
 
           </div>
-
-          <div class="actions">
-
-            <button
-              class="delete"
-              onclick="eliminarCompra('${x.id}')">
-
-              🗑️ Eliminar compra
-
-            </button>
-
-          </div>
-
-        </div>
 
         `;
 
@@ -2692,58 +2971,98 @@ function eliminarCompra(id){
       x=>String(x.id)===String(id)
     );
 
-
   if(!compra)return;
 
+  const esMultiple=
+    Array.isArray(compra.items);
 
-  if(!confirm(
-    `¿Eliminar esta compra?\n\n`+
-    `Producto: ${compra.producto}\n`+
-    `Cantidad: ${cantidad(compra.cantidad)} paquetes\n`+
-    `Total: ${money(compra.total)}\n\n`+
-    `El stock agregado será descontado.`
-  ))return;
+  let mensaje=
+    `¿Eliminar esta compra?\n\n`;
 
+  if(esMultiple){
 
-  const producto=
-    db.productos.find(
-      p=>
-        String(p.id)===
-        String(compra.productoId)
-    );
+    mensaje+=
+      `Proveedor: ${compra.proveedor||'Sin proveedor'}\n`+
+      `Productos: ${compra.items.length}\n`+
+      `Total: ${money(compra.total)}\n\n`+
+      `El stock agregado será descontado.`;
 
+  }else{
 
-  if(producto){
-
-    const nuevoStock=
-      Number(producto.stock||0)-
-      Number(compra.cantidad||0);
-
-
-    if(nuevoStock< -0.0000001){
-
-      alert(
-        `No se puede eliminar esta compra porque el stock actual de "${producto.nombre}" es menor que la cantidad comprada.`
-      );
-
-      return;
-    }
-
-
-    producto.stock=
-      redondear(nuevoStock);
+    mensaje+=
+      `Producto: ${compra.producto}\n`+
+      `Cantidad: ${cantidad(compra.cantidad)} paquetes\n`+
+      `Total: ${money(compra.total)}\n\n`+
+      `El stock agregado será descontado.`;
 
   }
 
+  if(!confirm(mensaje))return;
+
+  const items=
+    esMultiple
+    ?compra.items
+    :[{
+      productoId:compra.productoId,
+      producto:compra.producto,
+      cantidad:compra.cantidad
+    }];
+
+  for(const item of items){
+
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.productoId)
+      );
+
+    if(producto){
+
+      const nuevoStock=
+        Number(producto.stock||0)-
+        Number(item.cantidad||0);
+
+      if(nuevoStock< -0.0000001){
+
+        alert(
+          `No se puede eliminar esta compra porque el stock actual de "${producto.nombre}" es menor que la cantidad comprada.`
+        );
+
+        return;
+      }
+
+    }
+
+  }
+
+  for(const item of items){
+
+    const producto=
+      db.productos.find(
+        p=>
+          String(p.id)===
+          String(item.productoId)
+      );
+
+    if(producto){
+
+      producto.stock=
+        redondear(
+          Number(producto.stock||0)-
+          Number(item.cantidad||0)
+        );
+
+    }
+
+  }
 
   db.compras=
     db.compras.filter(
       x=>String(x.id)!==String(id)
     );
 
-
   save();
-
 
   alert(
     'Compra eliminada y stock actualizado.'
@@ -2773,7 +3092,6 @@ function renderVentas(){
 
   el.innerHTML=
     db.ventas
-      .slice(0,30)
       .map(v=>`
 
         <div
