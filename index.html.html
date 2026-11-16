@@ -317,7 +317,7 @@ th,td{
 
 <header>
   <h1>ByC Descartables</h1>
-  <small>Sistema de gestión · versión 6.1</small>
+  <small>Sistema de gestión · versión 6.2</small>
 </header>
 
 <nav id="nav">
@@ -421,6 +421,10 @@ th,td{
 
   <div class="card">
     <h2>Productos cargados</h2>
+    <label for="buscarProducto">🔎 Buscar producto</label>
+    <input id="buscarProducto" type="search"
+           placeholder="Escribí el nombre del producto..."
+           oninput="renderProductos()">
     <div id="listaProductos"></div>
   </div>
 
@@ -470,9 +474,15 @@ th,td{
 
     </select>
 
+    <label for="buscarProductoVenta">🔎 Buscar producto para vender</label>
+    <input id="buscarProductoVenta"
+           type="search"
+           placeholder="Escribí el nombre del producto..."
+           oninput="buscarProductosVenta()">
+
     <label>Producto</label>
 
-    <select id="vProducto"></select>
+    <select id="vProducto" onchange="mostrarPrecio()"></select>
 
     <label>Vender por</label>
 
@@ -570,6 +580,12 @@ th,td{
 
     <div id="listaVentas"></div>
 
+  </div>
+
+  <div class="card">
+    <h2>👥 Administrar clientes</h2>
+    <p class="muted">Podés corregir nombres mal cargados o eliminar clientes que todavía no tengan movimientos.</p>
+    <div id="listaClientes"></div>
   </div>
 
 </section>
@@ -706,7 +722,7 @@ th,td{
    VERSION
 ===================================================== */
 
-const APP_VERSION='6.1';
+const APP_VERSION='6.2';
 
 
 /* =====================================================
@@ -801,6 +817,10 @@ db.productos.forEach(p=>{
   p.stock=Number(p.stock)||0;
 
 });
+
+db.productos.sort((a,b)=>String(a.nombre||'').localeCompare(
+  String(b.nombre||''),'es',{sensitivity:'base',numeric:true}
+));
 
 
 /* =====================================================
@@ -976,6 +996,19 @@ function show(id){
    PRODUCTOS
 ===================================================== */
 
+function ordenarProductos(){
+
+  db.productos.sort((a,b)=>
+    String(a.nombre||'').localeCompare(
+      String(b.nombre||''),
+      'es',
+      {sensitivity:'base', numeric:true}
+    )
+  );
+
+}
+
+
 function agregarProducto(){
 
   const nombre=
@@ -1039,6 +1072,7 @@ function agregarProducto(){
 
   });
 
+  ordenarProductos();
 
   $('pNombre').value='';
   $('pCompra').value='';
@@ -1059,11 +1093,28 @@ function agregarProducto(){
 function renderProductos(){
 
   const el=$('listaProductos');
+  const busqueda=($('buscarProducto')?.value||'')
+    .trim()
+    .toLocaleLowerCase('es');
+
+  ordenarProductos();
 
   if(!db.productos.length){
 
     el.innerHTML=
       '<span class="muted">No hay productos cargados.</span>';
+
+    return;
+  }
+
+  const productosFiltrados=db.productos.filter(p=>
+    String(p.nombre||'').toLocaleLowerCase('es').includes(busqueda)
+  );
+
+  if(!productosFiltrados.length){
+
+    el.innerHTML=
+      '<span class="muted">No se encontraron productos con esa búsqueda.</span>';
 
     return;
   }
@@ -1083,7 +1134,7 @@ function renderProductos(){
       </tr>
 
       ${
-        db.productos.map(p=>{
+        productosFiltrados.map(p=>{
 
           const up=
             Number(p.unidadesPaquete)||1;
@@ -1224,6 +1275,7 @@ function editarProducto(id){
   p.unidadesPaquete=Math.round(up);
   p.stock=st;
 
+  ordenarProductos();
 
   save();
 
@@ -1304,6 +1356,8 @@ function eliminarProducto(id){
 
 function renderSelects(){
 
+  ordenarProductos();
+
   const opts=
     db.productos.map(p=>{
 
@@ -1332,8 +1386,53 @@ function renderSelects(){
 
   renderClientes();
 
+  buscarProductosVenta();
+
   mostrarPrecio();
   mostrarPrecioCompra();
+
+}
+
+
+function buscarProductosVenta(){
+
+  const campo=$('buscarProductoVenta');
+  const select=$('vProducto');
+
+  if(!campo || !select)return;
+
+  const busqueda=campo.value
+    .trim()
+    .toLocaleLowerCase('es');
+
+  const seleccionado=select.value;
+
+  const filtrados=db.productos.filter(p=>
+    String(p.nombre||'')
+      .toLocaleLowerCase('es')
+      .includes(busqueda)
+  );
+
+  if(!filtrados.length){
+    select.innerHTML=
+      '<option value="">No se encontraron productos</option>';
+    mostrarPrecio();
+    return;
+  }
+
+  select.innerHTML=filtrados.map(p=>`
+    <option value="${p.id}">
+      ${esc(p.nombre)}
+      — ${money(p.venta)}
+      — stock ${cantidad(p.stock)} paq.
+    </option>
+  `).join('');
+
+  if(filtrados.some(p=>String(p.id)===String(seleccionado))){
+    select.value=seleccionado;
+  }
+
+  mostrarPrecio();
 
 }
 
@@ -1370,6 +1469,10 @@ function renderClientes(){
     `;
 
     html+=db.clientes
+      .slice()
+      .sort((a,b)=>String(a.nombre||'').localeCompare(
+        String(b.nombre||''),'es',{sensitivity:'base',numeric:true}
+      ))
       .map(c=>`
 
         <option value="${c.id}">
@@ -1781,8 +1884,109 @@ function registrarCliente(nombre){
 
   db.clientes.push(cliente);
 
+  db.clientes.sort((a,b)=>String(a.nombre||'').localeCompare(
+    String(b.nombre||''),'es',{sensitivity:'base',numeric:true}
+  ));
+
   return cliente;
 
+}
+
+
+function renderListaClientes(){
+
+  const el=$('listaClientes');
+  if(!el)return;
+
+  const clientes=db.clientes.slice().sort((a,b)=>
+    String(a.nombre||'').localeCompare(
+      String(b.nombre||''),
+      'es',
+      {sensitivity:'base',numeric:true}
+    )
+  );
+
+  if(!clientes.length){
+    el.innerHTML='<span class="muted">Todavía no hay clientes registrados.</span>';
+    return;
+  }
+
+  el.innerHTML=`
+    <table>
+      <tr>
+        <th>Cliente</th>
+        <th>Acciones</th>
+      </tr>
+      ${clientes.map(c=>`
+        <tr>
+          <td>${esc(c.nombre)}</td>
+          <td>
+            <button class="secondary" onclick="editarCliente('${c.id}')">✏️ Editar</button>
+            <button class="delete" onclick="eliminarCliente('${c.id}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('')}
+    </table>
+  `;
+}
+
+
+function editarCliente(id){
+
+  const cliente=db.clientes.find(c=>String(c.id)===String(id));
+  if(!cliente)return;
+
+  const nombre=prompt('Corregir nombre del cliente:',cliente.nombre);
+  if(nombre===null)return;
+
+  const nuevoNombre=String(nombre).trim().replace(/\\s+/g,' ');
+  if(!nuevoNombre){
+    alert('El nombre del cliente no puede quedar vacío.');
+    return;
+  }
+
+  const duplicado=db.clientes.find(c=>
+    String(c.id)!==String(id) &&
+    normalizarCliente(c.nombre)===normalizarCliente(nuevoNombre)
+  );
+
+  if(duplicado){
+    alert('Ya existe otro cliente con ese nombre. Revisá la lista para evitar duplicados.');
+    return;
+  }
+
+  cliente.nombre=nuevoNombre;
+  db.clientes.sort((a,b)=>String(a.nombre||'').localeCompare(
+    String(b.nombre||''),'es',{sensitivity:'base',numeric:true}
+  ));
+
+  save();
+  alert('Cliente actualizado correctamente.');
+}
+
+
+function eliminarCliente(id){
+
+  const cliente=db.clientes.find(c=>String(c.id)===String(id));
+  if(!cliente)return;
+
+  const tieneMovimientos=
+    db.ventas.some(v=>String(v.clienteId)===String(id)) ||
+    db.pagos.some(p=>String(p.clienteId)===String(id));
+
+  if(tieneMovimientos){
+    alert(
+      'No se puede eliminar este cliente porque tiene ventas o pagos asociados.\\n\\n'+
+      'Para corregir un nombre mal escrito, usá la opción Editar. Así se conserva el historial y la cuenta corriente.'
+    );
+    return;
+  }
+
+  if(!confirm('¿Eliminar al cliente "'+cliente.nombre+'"?'))return;
+
+  db.clientes=db.clientes.filter(c=>String(c.id)!==String(id));
+  save();
+  alert('Cliente eliminado correctamente.');
 }
 
 
@@ -4318,6 +4522,8 @@ function renderAll(){
   renderSelects();
 
   renderProductos();
+
+  renderListaClientes();
 
   renderCompras();
 
