@@ -352,7 +352,7 @@ th,td{
     alt="Logo ByC Descartables">
   <div class="brand-titles">
     <h1>ByC Descartables</h1>
-    <small>Sistema de gestión · versión 6.2</small>
+    <small>Sistema de gestión · versión 6.4</small>
   </div>
 </header>
 
@@ -637,6 +637,12 @@ th,td{
     <input id="cProveedor"
            placeholder="Ej. Distribuidora San Rafael">
 
+    <label for="buscarProductoCompra">🔎 Buscar producto</label>
+    <input id="buscarProductoCompra"
+           type="search"
+           placeholder="Escribí el nombre del producto..."
+           oninput="buscarProductosCompra()">
+
     <label>Producto</label>
     <select id="cProducto"></select>
 
@@ -758,7 +764,7 @@ th,td{
    VERSION
 ===================================================== */
 
-const APP_VERSION='6.2';
+const APP_VERSION='6.4';
 
 
 /* =====================================================
@@ -1423,6 +1429,7 @@ function renderSelects(){
   renderClientes();
 
   buscarProductosVenta();
+  buscarProductosCompra();
 
   mostrarPrecio();
   mostrarPrecioCompra();
@@ -1469,6 +1476,49 @@ function buscarProductosVenta(){
   }
 
   mostrarPrecio();
+
+}
+
+
+function buscarProductosCompra(){
+
+  const campo=$('buscarProductoCompra');
+  const select=$('cProducto');
+
+  if(!campo || !select)return;
+
+  const busqueda=campo.value
+    .trim()
+    .toLocaleLowerCase('es');
+
+  const seleccionado=select.value;
+
+  const filtrados=db.productos.filter(p=>
+    String(p.nombre||'')
+      .toLocaleLowerCase('es')
+      .includes(busqueda)
+  );
+
+  if(!filtrados.length){
+    select.innerHTML=
+      '<option value="">No se encontraron productos</option>';
+    mostrarPrecioCompra();
+    return;
+  }
+
+  select.innerHTML=filtrados.map(p=>`
+    <option value="${p.id}">
+      ${esc(p.nombre)}
+      — compra ${money(p.compra)}
+      — stock ${cantidad(p.stock)} paq.
+    </option>
+  `).join('');
+
+  if(filtrados.some(p=>String(p.id)===String(seleccionado))){
+    select.value=seleccionado;
+  }
+
+  mostrarPrecioCompra();
 
 }
 
@@ -2593,6 +2643,11 @@ function mostrarComprobante(v){
   $('comprobante').innerHTML=`
 
     <div class="receipt">
+
+      <img
+        src="${esc(document.querySelector('header .brand-logo').src)}"
+        alt="Logo ByC Descartables"
+        style="display:block;max-width:180px;max-height:110px;width:auto;height:auto;object-fit:contain;margin:0 auto 10px;">
 
       <h2>ByC Descartables</h2>
 
